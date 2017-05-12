@@ -1,0 +1,11 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.lightswitchField({
+	first: true,
+	label: "Display Variants as Individual Products"|t,
+	id: 'options[variants]',
+	name: 'options[variants]',
+	on:  options.variants is defined ? options.variants : null,
+	onLabel: "Enable"|t,
+	offLabel: "Disable"|t
+}) }}
