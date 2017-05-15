@@ -9,3 +9,10 @@
 	onLabel: "Enable"|t,
 	offLabel: "Disable"|t
 }) }}
+
+{{ forms.dateTimeField({
+	label: "Order Start Date"|t,
+	id: 'options[startDate]',
+	name: 'options[startDate]',
+	value: options.startDate is defined ? options.startDate : null
+}) }}
