@@ -6,12 +6,12 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 {
 	public function getName()
 	{
-		return Craft::t('Commerce Product Revenue.');
+		return Craft::t('Product Revenue');
 	}
 
 	public function getDescription()
 	{
-		return Craft::t('Displays a list of products and the total revenue earned');
+		return Craft::t('Create sales reports for your products and variants.');
 	}
 
 	/**
@@ -79,7 +79,6 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 		}
 
 		$query->order('products.id DESC');
-
 
 		$results = $query->queryAll();
 

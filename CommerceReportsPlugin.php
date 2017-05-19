@@ -17,7 +17,7 @@ class CommerceReportsPlugin extends BasePlugin
 	 */
 	public function getVersion()
 	{
-		return '1.0.0';
+		return '0.5.0';
 	}
 
 	/**
@@ -44,18 +44,13 @@ class CommerceReportsPlugin extends BasePlugin
 		return false;
 	}
 
-	public function init()
-	{
-		parent::init();
-
-	//	Craft::import('plugins.commercereports.integrations.sproutreports.reports.*');
-		Craft::import('plugins.commercereports.integrations.sproutreports.datasources.CommerceReportsProductRevenueDataSource');
-	}
 	/**
 	 * @return array
 	 */
 	public function registerSproutReportsDataSources()
 	{
+		Craft::import('plugins.commercereports.integrations.sproutreports.datasources.CommerceReportsProductRevenueDataSource');
+		
 		return array(
 			new CommerceReportsProductRevenueDataSource()
 		);
