@@ -41,6 +41,7 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 
 	public function getResults(SproutReports_ReportModel &$report, $options = array())
 	{
+		$displayVariants = false;
 		$startDate = DateTime::createFromString($report->getOption('startDate'), craft()->timezone);
 		$endDate   = DateTime::createFromString($report->getOption('endDate'), craft()->timezone);
 
@@ -48,6 +49,7 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 		if (!count($options))
 		{
 			$options = $report->getOptions();
+			$displayVariants = $options['variants'];
 		}
 
 		$criteria = $criteria = craft()->elements->getCriteria('Commerce_Order');
@@ -69,7 +71,7 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 		  $query->andWhere('orders.dateOrdered < :endDate', array(':endDate' => $endDate->mySqlDateTime()));
 		}
 
-		if (!empty($options['variants']))
+		if (!empty($displayVariants))
 		{
 			$query->group('lineitems.purchasableId');
 		}
@@ -86,11 +88,18 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 		{
 			foreach ($results as $key => $result)
 			{
+				$productId = $result['Product ID'];
 				$variantId = $result['Variants ID'];
 
-				$element = craft()->elements->getElementById($variantId);
+				$productElement = craft()->elements->getElementById($productId);
 
-				$results[$key]['Title'] = $element->title;
+				if (!empty($displayVariants))
+				{
+					$variantElement = craft()->elements->getElementById($variantId);
+					$results[$key]['Variant Title'] = $variantElement->title;
+				}
+
+				$results[$key]['Product Title'] = $productElement->title;
 
 				if (empty($options['variants']))
 				{
