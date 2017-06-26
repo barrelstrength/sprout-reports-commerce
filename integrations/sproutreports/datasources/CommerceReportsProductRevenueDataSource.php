@@ -6,12 +6,12 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 {
 	public function getName()
 	{
-		return Craft::t('Commerce Product Revenue.');
+		return Craft::t('Product Revenue');
 	}
 
 	public function getDescription()
 	{
-		return Craft::t('Displays a list of products and the total revenue earned');
+		return Craft::t('Create sales reports for your products and variants.');
 	}
 
 	/**
@@ -32,7 +32,7 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 			$options['endDate']   = DateTime::createFromString($this->report->getOption('endDate'), craft()->timezone);
 		}
 
-		return craft()->templates->render('commercereports/datasources/_options/productrevenue', array(
+		return craft()->templates->render('commercereports/datasources/productrevenue/_options', array(
 			'options' => $options,
 			'defaultStartDate' => new DateTime($defaultStartDate),
 			'defaultEndDate'   => new DateTime($defaultEndDate)
@@ -41,14 +41,15 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 
 	public function getResults(SproutReports_ReportModel &$report, $options = array())
 	{
+		$displayVariants = false;
 		$startDate = DateTime::createFromString($report->getOption('startDate'), craft()->timezone);
 		$endDate   = DateTime::createFromString($report->getOption('endDate'), craft()->timezone);
-
 
 		// First, use dynamic options, fallback to report options
 		if (!count($options))
 		{
 			$options = $report->getOptions();
+			$displayVariants = $options['variants'];
 		}
 
 		$criteria = $criteria = craft()->elements->getCriteria('Commerce_Order');
@@ -58,7 +59,7 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 		$criteria->search = null;
 
 		$query = craft()->db->createCommand()
-			->select('variants.id as \'Variants ID\', products.id as \'Product ID\', orders.id as \'Order ID\', orders.dateOrdered as \'Date Ordered\', sum(lineitems.total) as Revenue, variants.sku as SKU')
+			->select('variants.id as \'Variants ID\', products.id as \'Product ID\', orders.id as \'Order ID\', orders.dateOrdered as \'Date Ordered\', FORMAT(SUM(lineitems.total), 2) as Revenue, variants.sku as SKU')
 			->from('commerce_orders as orders')
 			->leftJoin('commerce_lineitems as lineitems', 'orders.id = lineitems.orderId')
 			->leftJoin('commerce_variants as variants', 'lineitems.purchasableId = variants.id')
@@ -70,7 +71,7 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 		  $query->andWhere('orders.dateOrdered < :endDate', array(':endDate' => $endDate->mySqlDateTime()));
 		}
 
-		if (!empty($options['variants']))
+		if (!empty($displayVariants))
 		{
 			$query->group('lineitems.purchasableId');
 		}
@@ -81,18 +82,24 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 
 		$query->order('products.id DESC');
 
-
 		$results = $query->queryAll();
 
 		if ($results)
 		{
 			foreach ($results as $key => $result)
 			{
+				$productId = $result['Product ID'];
 				$variantId = $result['Variants ID'];
 
-				$element = craft()->elements->getElementById($variantId);
+				$productElement = craft()->elements->getElementById($productId);
 
-				$results[$key]['Title'] = $element->title;
+				if (!empty($displayVariants))
+				{
+					$variantElement = craft()->elements->getElementById($variantId);
+					$results[$key]['Variant Title'] = $variantElement->title;
+				}
+
+				$results[$key]['Product Title'] = $productElement->title;
 
 				if (empty($options['variants']))
 				{
