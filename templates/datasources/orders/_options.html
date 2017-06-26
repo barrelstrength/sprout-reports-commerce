@@ -1,0 +1,23 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.selectField({
+	id: 'orderadjustment-type',
+	label: "Order Adjustment Type"|t,
+	name: 'options[orderAdjustmentType]',
+	options: orderAdjustmentTypeOptions,
+	value: options.orderAdjustmentType is defined ? options.orderAdjustmentType : 'Tax',
+}) }}
+
+{{ forms.dateTimeField({
+	label: "Order Start Date"|t,
+	id: 'startDate',
+	name: 'options[startDate]',
+	value: (options.startDate is defined ? options.startDate : defaultStartDate)
+}) }}
+
+{{ forms.dateTimeField({
+	label: "Order End Date"|t,
+	id: 'endDate',
+	name: 'options[endDate]',
+	value: (options.endDate is defined ? options.endDate : defaultStartDate)
+}) }}

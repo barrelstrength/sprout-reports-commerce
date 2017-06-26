@@ -50,9 +50,11 @@ class CommerceReportsPlugin extends BasePlugin
 	public function registerSproutReportsDataSources()
 	{
 		Craft::import('plugins.commercereports.integrations.sproutreports.datasources.CommerceReportsProductRevenueDataSource');
-		
+		Craft::import('plugins.commercereports.integrations.sproutreports.datasources.CommerceReportsOrdersDataSource');
+
 		return array(
-			new CommerceReportsProductRevenueDataSource()
+			new CommerceReportsProductRevenueDataSource(),
+			new CommerceReportsOrdersDataSource()
 		);
 	}
 }
