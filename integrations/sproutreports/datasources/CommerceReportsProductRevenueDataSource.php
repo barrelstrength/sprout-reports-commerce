@@ -100,7 +100,10 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 					$results[$key]['Variant Title'] = $variantElement->title;
 				}
 
-				$results[$key]['Product Title'] = $productElement->title;
+				if ($productElement)
+				{
+					$results[$key]['Product Title'] = $productElement->title;
+				}
 
 				if (empty($options['variants']))
 				{
