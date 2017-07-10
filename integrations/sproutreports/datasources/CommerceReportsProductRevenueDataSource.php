@@ -59,7 +59,7 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 		$criteria->search = null;
 
 		$query = craft()->db->createCommand()
-			->select('variants.id as \'Variants ID\', products.id as \'Product ID\', orders.id as \'Order ID\', orders.dateOrdered as \'Date Ordered\', sum(lineitems.salePrice * lineitems.qty) as Revenue, FORMAT(SUM(lineitems.total), 2) as \'Items Total Price\', variants.sku as SKU')
+			->select('variants.id as \'Variants ID\', products.id as \'Product ID\', orders.id as \'Order ID\', orders.dateOrdered as \'Date Ordered\', FORMAT(SUM(lineitems.salePrice * lineitems.qty), 2) as Revenue, FORMAT(SUM(lineitems.total), 2) as \'Items Total Price\', variants.sku as SKU')
 			->from('commerce_orders as orders')
 			->leftJoin('commerce_lineitems as lineitems', 'orders.id = lineitems.orderId')
 			->leftJoin('commerce_variants as variants', 'lineitems.purchasableId = variants.id')
@@ -100,7 +100,10 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 					$results[$key]['Variant Title'] = $variantElement->title;
 				}
 
-				$results[$key]['Product Title'] = $productElement->title;
+				if ($productElement)
+				{
+					$results[$key]['Product Title'] = $productElement->title;
+				}
 
 				if (empty($options['variants']))
 				{
