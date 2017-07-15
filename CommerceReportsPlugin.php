@@ -54,7 +54,7 @@ class CommerceReportsPlugin extends BasePlugin
 
 		return array(
 			new CommerceReportsProductRevenueDataSource(),
-			new CommerceReportsOrdersDataSource()
+			//new CommerceReportsOrdersDataSource()
 		);
 	}
 }
