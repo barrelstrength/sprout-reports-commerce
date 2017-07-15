@@ -6,7 +6,7 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 {
 	public function getName()
 	{
-		return Craft::t('Product Revenue');
+		return Craft::t('Commerce Product Revenue');
 	}
 
 	public function getDescription()
@@ -59,12 +59,16 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 		$criteria->search = null;
 
 		$query = craft()->db->createCommand()
-			->select('variants.id as \'Variants ID\', products.id as \'Product ID\', orders.id as \'Order ID\', orders.dateOrdered as \'Date Ordered\', FORMAT(SUM(lineitems.salePrice * lineitems.qty), 2) as Revenue, FORMAT(SUM(lineitems.total), 2) as \'Items Total Price\', variants.sku as SKU')
+			->select('variants.id as \'Variants ID\', 
+			                  products.id as \'Product ID\',
+			                  orders.id as \'Order ID\',
+			                  FORMAT(SUM(lineitems.total), 2) as \'Total Revenue\',
+			                  SUM(lineitems.qty) as \'Total Items Sold\',
+			                  variants.sku as SKU')
 			->from('commerce_orders as orders')
 			->leftJoin('commerce_lineitems as lineitems', 'orders.id = lineitems.orderId')
 			->leftJoin('commerce_variants as variants', 'lineitems.purchasableId = variants.id')
-			// Do not include product that since been removed from the store.
-			->join('commerce_products as products', 'variants.productId = products.id');
+			->leftJoin('commerce_products as products', 'variants.productId = products.id');
 
 		if ($startDate && $endDate)
 		{
@@ -97,20 +101,31 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 				if (!empty($displayVariants))
 				{
 					$variantElement = craft()->elements->getElementById($variantId);
-					$results[$key]['Variant Title'] = $variantElement->title;
+
+					if ($variantElement)
+					{
+						$results[$key]['Variant Title'] = $variantElement->title;
+					}
+					else
+					{
+						$results[$key]['Variant Title'] = Craft::t('Variant has been deleted');
+					}
 				}
 
 				if ($productElement)
 				{
 					$results[$key]['Product Title'] = $productElement->title;
 				}
-
-				if (empty($options['variants']))
+				else
 				{
-					// Do not display to avoid confusion
-					unset($results[$key]['SKU']);
-					unset($results[$key]['Variants ID']);
+					$results[$key]['Product Title'] = Craft::t('Product has been deleted');
 				}
+
+				// Do not display IDs
+				unset($results[$key]['SKU']);
+				unset($results[$key]['Product ID']);
+				unset($results[$key]['Variants ID']);
+				unset($results[$key]['Order ID']);
 
 				$results[$key] = array_reverse($results[$key], true);
 			}
