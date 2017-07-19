@@ -62,8 +62,13 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 			->select('variants.id as \'Variants ID\', 
 			                  products.id as \'Product ID\',
 			                  orders.id as \'Order ID\',
-			                  FORMAT(SUM(lineitems.total), 2) as \'Total Revenue\',
-			                  SUM(lineitems.qty) as \'Total Items Sold\',
+			                  FORMAT(SUM(lineitems.total), 2) as \'Line Item Revenue\',
+			                  SUM(lineitems.discount) as \'Line Item Discount\',
+			                  SUM(lineitems.shippingCost) as \'Line Item Shipping Cost\',
+			                  SUM(lineitems.taxIncluded) as \'Line Item Tax Included\',
+			                  SUM(lineitems.tax) as \'Line Item Tax\',
+			                  FORMAT(SUM(lineitems.salePrice * lineitems.qty), 2) as \'Product Revenue\',
+			                  SUM(lineitems.qty) as \'Quantity Sold\',
 			                  variants.sku as SKU')
 			->from('commerce_orders as orders')
 			->leftJoin('commerce_lineitems as lineitems', 'orders.id = lineitems.orderId')
@@ -122,7 +127,6 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 				}
 
 				// Do not display IDs
-				unset($results[$key]['SKU']);
 				unset($results[$key]['Product ID']);
 				unset($results[$key]['Variants ID']);
 				unset($results[$key]['Order ID']);
