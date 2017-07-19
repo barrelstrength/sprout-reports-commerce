@@ -4,7 +4,7 @@
 
     <property name="pluginFileName" value="CommerceReports" />
     <property name="pluginName" value="commercereports" />
-    <property name="pluginVersion" value="0.5.2" />
+    <property name="pluginVersion" value="0.5.3" />
 
     <target name="release">
         <echo msg="Preparing release distro..." />

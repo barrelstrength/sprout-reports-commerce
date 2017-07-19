@@ -17,7 +17,7 @@ class CommerceReportsPlugin extends BasePlugin
 	 */
 	public function getVersion()
 	{
-		return '0.5.2';
+		return '0.5.3';
 	}
 
 	/**
