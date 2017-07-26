@@ -2,7 +2,7 @@
 
 namespace Craft;
 
-class CommerceReportsOrdersDataSource extends SproutReportsBaseDataSource
+class CommerceReportsOrderHistoryDataSource extends SproutReportsBaseDataSource
 {
 	public function getName()
 	{
