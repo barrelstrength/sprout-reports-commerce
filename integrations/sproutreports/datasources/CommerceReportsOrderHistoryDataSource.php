@@ -46,13 +46,9 @@ class CommerceReportsOrderHistoryDataSource extends SproutReportsBaseDataSource
 
 		// @todo - needs to take into account multiple adjustments and the various types of adjustments
 		$query = craft()->db->createCommand()
-			->select('orders.number as Order Number,
-			          orderadjustments.type as Type, 
-			          orderadjustments.amount as Amount, 
-			          orders.totalPaid as Total Paid,
-			          orders.dateOrdered as Date Ordered')
-			->from('commerce_orders as orders')
-			->leftJoin('commerce_orderadjustments as orderadjustments', 'orders.id = orderadjustments.orderId');
+			->select("orders.id as Order ID, orders.number as Order Number,			      
+			          orders.dateOrdered, orders.totalPaid as Total Revenue")
+			->from('commerce_orders as orders');
 
 		if ($startDate && $endDate)
 		{
@@ -70,6 +66,56 @@ class CommerceReportsOrderHistoryDataSource extends SproutReportsBaseDataSource
 			}
 		}
 
+		if (!empty($results))
+		{
+			foreach ($results as $key => $result)
+			{
+				$orderId = $result['Order ID'];
+
+				$totalTax      = $this->getTotalAdjustmentByType($orderId);
+
+				$totalShipping = $this->getTotalAdjustmentByType($orderId, 'Shipping');
+
+				$results[$key]['Tax']      = $totalTax;
+				$results[$key]['Shipping'] = $totalShipping;
+
+				$productRevenue = $results[$key]['Total Revenue'] - ($totalShipping + $totalTax);
+
+				$results[$key]['Product Revenue']  = number_format($productRevenue, 2);
+				$results[$key]['Date Ordered']  = $result['dateOrdered'];
+
+				// Place dateOrdered on the last column
+				unset($results[$key]['dateOrdered']);
+			}
+		}
+
 		return $results;
+	}
+
+	/**
+	 * Calculate total tax and shipping include base values on orders table
+	 * 
+	 * @param        $orderId
+	 * @param string $type
+	 *
+	 * @return bool|\CDbDataReader|mixed|string
+	 */
+	private function getTotalAdjustmentByType($orderId, $type = 'Tax')
+	{
+		$included = 'orders.baseTax + orders.baseTaxIncluded';
+
+		if ($type == 'Shipping')
+		{
+			$included = 'orders.baseShippingCost';
+		}
+
+		$query = craft()->db->createCommand()
+			->select("SUM(orderadjustments.amount) + $included")
+			->from('commerce_orders as orders')
+			->leftJoin('commerce_orderadjustments as orderadjustments', 'orders.id = orderadjustments.orderId')
+			->where('orders.id = :orderId', array('orderId' => $orderId))
+			->andWhere("orderadjustments.type = '$type'");
+
+		return $query->queryScalar();
 	}
 }
