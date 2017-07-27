@@ -1,20 +1,11 @@
 {% import "_includes/forms" as forms %}
 
-{{ forms.lightswitchField({
-	first: true,
-	label: "Display Variants as Individual Products"|t,
-	id: 'variants',
-	name: 'options[variants]',
-	on:  options.variants is defined ? options.variants : null,
-	onLabel: "Enable"|t,
-	offLabel: "Disable"|t
-}) }}
-
 {{ forms.dateTimeField({
 	label: "Order Start Date"|t,
 	id: 'startDate',
 	name: 'options[startDate]',
-	value: (options.startDate is defined ? options.startDate : defaultStartDate)
+	value: (options.startDate is defined ? options.startDate : defaultStartDate),
+	first: true
 }) }}
 
 {{ forms.dateTimeField({
@@ -22,4 +13,13 @@
 	id: 'endDate',
 	name: 'options[endDate]',
 	value: (options.endDate is defined ? options.endDate : defaultStartDate)
+}) }}
+
+{{ forms.lightswitchField({
+	label: "Display Variants as Individual Products"|t,
+	id: 'variants',
+	name: 'options[variants]',
+	on:  options.variants is defined ? options.variants : null,
+	onLabel: "Enable"|t,
+	offLabel: "Disable"|t
 }) }}

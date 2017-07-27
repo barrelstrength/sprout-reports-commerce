@@ -2,11 +2,11 @@
 
 namespace Craft;
 
-class CommerceReportsOrdersDataSource extends SproutReportsBaseDataSource
+class CommerceReportsOrderHistoryDataSource extends SproutReportsBaseDataSource
 {
 	public function getName()
 	{
-		return Craft::t('Commerce Orders Report');
+		return Craft::t('Commerce Order History');
 	}
 
 	public function getDescription()
@@ -44,8 +44,13 @@ class CommerceReportsOrdersDataSource extends SproutReportsBaseDataSource
 		$startDate = DateTime::createFromString($report->getOption('startDate'), craft()->timezone);
 		$endDate   = DateTime::createFromString($report->getOption('endDate'), craft()->timezone);
 
+		// @todo - needs to take into account multiple adjustments and the various types of adjustments
 		$query = craft()->db->createCommand()
-			->select('orders.number as Order Number, orders.dateOrdered as Date Ordered, orderadjustments.orderId as Order ID, orderadjustments.type as Type, orderadjustments.amount as Amount, orders.totalPaid as Total Paid')
+			->select('orders.number as Order Number,
+			          orderadjustments.type as Type, 
+			          orderadjustments.amount as Amount, 
+			          orders.totalPaid as Total Paid,
+			          orders.dateOrdered as Date Ordered')
 			->from('commerce_orders as orders')
 			->leftJoin('commerce_orderadjustments as orderadjustments', 'orders.id = orderadjustments.orderId');
 
