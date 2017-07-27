@@ -13,3 +13,9 @@
 	name: 'options[endDate]',
 	value: (options.endDate is defined ? options.endDate : defaultStartDate)
 }) }}
+
+{{ forms.lightswitchField({
+	label: "Calculate Totals",
+	name: 'options[calculateTotals]',
+	on: options.calculateTotals is defined ? options.calculateTotals : null
+}) }}
