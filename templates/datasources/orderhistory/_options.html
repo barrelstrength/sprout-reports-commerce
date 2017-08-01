@@ -1,0 +1,25 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.dateTimeField({
+	label: "Start Date"|t,
+	instructions: "The start date of the date range you wish to display in your report."|t,
+	id: 'startDate',
+	name: 'options[startDate]',
+	value: (options.startDate is defined ? options.startDate : defaultStartDate),
+	first: true
+}) }}
+
+{{ forms.dateTimeField({
+	label: "End Date"|t,
+	instructions: "The end date of the date range you wish to display in your report."|t,
+	id: 'endDate',
+	name: 'options[endDate]',
+	value: (options.endDate is defined ? options.endDate : defaultStartDate)
+}) }}
+
+{{ forms.lightswitchField({
+	label: "Calculate Total"|t,
+	instructions: "Display the sum of all results as a single line."|t,
+	name: 'options[calculateTotals]',
+	on: options.calculateTotals is defined ? options.calculateTotals : null
+}) }}
