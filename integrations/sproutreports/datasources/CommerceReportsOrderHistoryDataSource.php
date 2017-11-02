@@ -213,4 +213,13 @@ class CommerceReportsOrderHistoryDataSource extends SproutReportsBaseDataSource
 
 		return $query->queryScalar();
 	}
+
+	public function prepOptions($options)
+	{
+
+		$options['startDate'] = DateTime::createFromString($options['startDate']);
+		$options['endDate'] = DateTime::createFromString($options['endDate']);
+
+		return $options;	
+	}
 }

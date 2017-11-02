@@ -137,4 +137,13 @@ class CommerceReportsProductRevenueDataSource extends SproutReportsBaseDataSourc
 
 		return $results;
 	}
+
+	public function prepOptions($options)
+	{
+
+		$options['startDate'] = DateTime::createFromString($options['startDate']);
+		$options['endDate'] = DateTime::createFromString($options['endDate']);
+
+		return $options;	
+	}
 }
