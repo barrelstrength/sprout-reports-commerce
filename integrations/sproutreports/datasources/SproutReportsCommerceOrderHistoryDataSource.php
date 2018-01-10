@@ -2,7 +2,7 @@
 
 namespace Craft;
 
-class CommerceReportsOrderHistoryDataSource extends SproutReportsBaseDataSource
+class SproutReportsCommerceOrderHistoryDataSource extends SproutReportsBaseDataSource
 {
 	/**
 	 * @var SproutReports_ReportModel

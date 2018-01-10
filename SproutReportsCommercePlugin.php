@@ -2,14 +2,14 @@
 
 namespace Craft;
 
-class CommerceReportsPlugin extends BasePlugin
+class SproutReportsCommercePlugin extends BasePlugin
 {
 	/**
 	 * @return string
 	 */
 	public function getName()
 	{
-		return Craft::t('Commerce Reports');
+		return Craft::t('Sprout Reports for Craft Commerce');
 	}
 
 	/**
@@ -57,12 +57,12 @@ class CommerceReportsPlugin extends BasePlugin
 	 */
 	public function registerSproutReportsDataSources()
 	{
-		Craft::import('plugins.commercereports.integrations.sproutreports.datasources.CommerceReportsProductRevenueDataSource');
-		Craft::import('plugins.commercereports.integrations.sproutreports.datasources.CommerceReportsOrderHistoryDataSource');
+		Craft::import('plugins.sproutreportscommerce.integrations.sproutreports.datasources.SproutReportsCommerceProductRevenueDataSource');
+		Craft::import('plugins.sproutreportscommerce.integrations.sproutreports.datasources.SproutReportsCommerceOrderHistoryDataSource');
 
 		return array(
-			new CommerceReportsProductRevenueDataSource(),
-			new CommerceReportsOrderHistoryDataSource()
+			new SproutReportsCommerceProductRevenueDataSource(),
+			new SproutReportsCommerceOrderHistoryDataSource()
 		);
 	}
 }
