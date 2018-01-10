@@ -27,7 +27,7 @@ class SproutReportsCommercePlugin extends BasePlugin
      */
     public function getDescription()
     {
-        return Craft::t('A handful of Sprout Reports for Craft Commerce.');
+        return Craft::t('A collection of Sprout Reports for Craft Commerce.');
     }
 
 	/**
