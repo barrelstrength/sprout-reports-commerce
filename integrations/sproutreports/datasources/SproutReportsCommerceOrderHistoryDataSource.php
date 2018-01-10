@@ -19,11 +19,12 @@ class SproutReportsCommerceOrderHistoryDataSource extends SproutReportsBaseDataS
 		return Craft::t('Displays all orders by date range');
 	}
 
-	/**
-	 * @param array $options
-	 *
-	 * @return string
-	 */
+    /**
+     * @param array $options
+     *
+     * @return null|string
+     * @throws Exception
+     */
 	public function getOptionsHtml(array $options = array())
 	{
 		$defaultStartDate = null;
@@ -37,7 +38,7 @@ class SproutReportsCommerceOrderHistoryDataSource extends SproutReportsBaseDataS
 			$options['endDate']   = DateTime::createFromString($this->report->getOption('endDate'), craft()->timezone);
 		}
 
-		return craft()->templates->render('commercereports/datasources/orderhistory/_options', array(
+		return craft()->templates->render('sproutreportscommerce/datasources/orderhistory/_options', array(
 			'options'          => $options,
 			'defaultStartDate' => new DateTime($defaultStartDate),
 			'defaultEndDate'   => new DateTime($defaultEndDate)

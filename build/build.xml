@@ -2,8 +2,8 @@
 
 <project name="Commerce Reports" default="release">
 
-    <property name="pluginFileName" value="CommerceReports" />
-    <property name="pluginName" value="commercereports" />
+    <property name="pluginFileName" value="SproutReportsCommerce" />
+    <property name="pluginName" value="sproutreportscommerce" />
     <property name="pluginVersion" value="0.6.0" />
 
     <target name="release">

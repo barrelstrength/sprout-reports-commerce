@@ -4,21 +4,28 @@ namespace Craft;
 
 class SproutReportsCommerceProductRevenueDataSource extends SproutReportsBaseDataSource
 {
+    /**
+     * @return string
+     */
 	public function getName()
 	{
 		return Craft::t('Commerce Product Revenue');
 	}
 
+    /**
+     * @return string
+     */
 	public function getDescription()
 	{
 		return Craft::t('Create sales reports for your products and variants.');
 	}
 
-	/**
-	 * @param array $options
-	 *
-	 * @return string
-	 */
+    /**
+     * @param array $options
+     *
+     * @return null|string
+     * @throws Exception
+     */
 	public function getOptionsHtml(array $options = array())
 	{
 		$defaultStartDate = null;
@@ -32,13 +39,20 @@ class SproutReportsCommerceProductRevenueDataSource extends SproutReportsBaseDat
 			$options['endDate']   = DateTime::createFromString($this->report->getOption('endDate'), craft()->timezone);
 		}
 
-		return craft()->templates->render('commercereports/datasources/productrevenue/_options', array(
+		return craft()->templates->render('sproutreportscommerce/datasources/productrevenue/_options', array(
 			'options' => $options,
 			'defaultStartDate' => new DateTime($defaultStartDate),
 			'defaultEndDate'   => new DateTime($defaultEndDate)
 		));
 	}
 
+    /**
+     * @param SproutReports_ReportModel $report
+     * @param array                     $options
+     *
+     * @return array|\CDbDataReader
+     * @throws Exception
+     */
 	public function getResults(SproutReports_ReportModel &$report, $options = array())
 	{
 		$displayVariants = false;
