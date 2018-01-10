@@ -152,7 +152,12 @@ class SproutReportsCommerceProductRevenueDataSource extends SproutReportsBaseDat
 		return $results;
 	}
 
-	public function prepOptions($options)
+    /**
+     * @param array $options
+     *
+     * @return array|null
+     */
+	public function prepOptions(array $options)
 	{
 
 		$options['startDate'] = DateTime::createFromString($options['startDate']);

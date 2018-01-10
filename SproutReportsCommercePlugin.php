@@ -2,6 +2,16 @@
 
 namespace Craft;
 
+/**
+ * Class SproutReportsCommercePlugin
+ *
+ * @author    Barrel Strength Design LLC <sprout@barrelstrengthdesign.com>
+ * @copyright Copyright (c) 2012, Barrel Strength Design LLC
+ * @license   http://sprout.barrelstrengthdesign.com/license
+ * @see       http://sprout.barrelstrengthdesign.com
+ * @package   craft.plugins.sproutreportscommerceplugin
+ * @since     2.0
+ */
 class SproutReportsCommercePlugin extends BasePlugin
 {
 	/**
@@ -11,6 +21,14 @@ class SproutReportsCommercePlugin extends BasePlugin
 	{
 		return Craft::t('Sprout Reports for Craft Commerce');
 	}
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return Craft::t('A handful of Sprout Reports for Craft Commerce.');
+    }
 
 	/**
 	 * @return string
@@ -44,6 +62,14 @@ class SproutReportsCommercePlugin extends BasePlugin
 		return 'http://barrelstrengthdesign.com';
 	}
 
+    /**
+     * @return string
+     */
+    public function getDocumentationUrl()
+    {
+        return 'http://sprout.barrelstrengthdesign.com/craft-plugins/reports/docs';
+    }
+
 	/**
 	 * @return bool
 	 */
@@ -52,9 +78,10 @@ class SproutReportsCommercePlugin extends BasePlugin
 		return false;
 	}
 
-	/**
-	 * @return array
-	 */
+    /**
+     * @return array
+     * @throws \Exception
+     */
 	public function registerSproutReportsDataSources()
 	{
 		Craft::import('plugins.sproutreportscommerce.integrations.sproutreports.datasources.SproutReportsCommerceProductRevenueDataSource');
