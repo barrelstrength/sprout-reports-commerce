@@ -35,7 +35,7 @@ class SproutReportsCommercePlugin extends BasePlugin
 	 */
 	public function getVersion()
 	{
-		return '0.6.1';
+		return '0.7.0';
 	}
 
 	/**
@@ -67,7 +67,15 @@ class SproutReportsCommercePlugin extends BasePlugin
      */
     public function getDocumentationUrl()
     {
-        return 'http://sprout.barrelstrengthdesign.com/craft-plugins/reports/docs';
+        return "https://sprout.barrelstrengthdesign.com/docs/reports";
+    }
+
+    /**
+     * @return string
+     */
+    public function getReleaseFeedUrl()
+    {
+        return 'https://raw.githubusercontent.com/barrelstrength/craft-sprout-reports-commerce/v0/releases.json';
     }
 
 	/**
