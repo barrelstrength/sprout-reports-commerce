@@ -2,7 +2,7 @@
 
 namespace Craft;
 
-class SproutReportsCommerceProductRevenueDataSource extends SproutReportsBaseDataSource
+class CommerceProductRevenueDataSource extends SproutReportsBaseDataSource
 {
     /**
      * @return string

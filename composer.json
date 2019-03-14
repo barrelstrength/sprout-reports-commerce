@@ -1,0 +1,48 @@
+{
+    "name": "barrelstrength/sprout-reports-commerce",
+    "description": "A collection of Commerce-related Data Sources for Sprout Reports",
+    "version": "1.0.0",
+    "type": "craft-plugin",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "reports",
+        "sprout reports"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Barrel Strength",
+            "homepage": "https://barrelstrengthdesign.com"
+        }
+    ],
+    "support": {
+        "email": "sprout@barrelstrengthdesign.com",
+        "issues": "https://github.com/barrelstrength/sprout-reports/issues?state=open",
+        "source": "https://github.com/barrelstrength/sprout-reports",
+        "docs": "https://sprout.barrelstrengthdesign.com/craft-plugins/reports/docs",
+        "rss": "https://github.com/barrelstrength/sprout-reports/commits/v2.atom"
+    },
+    "require": {
+        "craftcms/cms": "^3.1.0",
+        "barrelstrength/sprout-base": "^4.0.6",
+        "barrelstrength/sprout-base-reports": "^1.0.0",
+        "barrelstrength/sprout-reports": "^1.1.2"
+    },
+    "autoload": {
+        "psr-4": {
+          "barrelstrength\\sproutreportscategories\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Commerce Data Source for Sprout Reports",
+        "handle": "sprout-reports-commerce",
+        "developer": "Barrel Strength",
+        "developerUrl": "https://barrelstrengthdesign.com",
+        "documentationUrl": "https://sprout.barrelstrengthdesign.com/craft-plugins/reports",
+        "changelogUrl": "https://raw.githubusercontent.com/BarrelStrength/sprout-reports-categories/master/CHANGELOG.md",
+        "downloadUrl": "https://github.com/BarrelStrength/sprout-reports-categories/archive/master.zip",
+        "class": "barrelstrength\\sproutreportscommerce\\SproutReportsCommerce"
+    }
+}
