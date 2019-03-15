@@ -4,8 +4,7 @@ namespace barrelstrength\sproutreportscommerce\integrations\sproutreports\dataso
 
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
-use craft\records\Category as CategoryRecord;
-use craft\records\Entry as EntryRecord;
+use craft\helpers\DateTimeHelper;
 use craft\db\Query;
 use Craft;
 
@@ -25,18 +24,19 @@ class CommerceOrderHistoryDataSource extends DataSource
     }
 
     /**
-     * Gets the results for the Order History Report
      *
+     * Gets the results for the Order History Report
      * @param Report $report
      * @param array  $settings
      *
      * @return array
+     * @throws \Exception
      */
     public function getResults(Report $report, array $settings = []): array
     {
         $this->reportModel = $report;
 
-        $calculateTotals = $report->getOption('calculateTotals');
+        $calculateTotals = $report->getSetting('calculateTotals');
 
         if ($calculateTotals) {
             return $this->getReportWithCalculateTotals();
@@ -45,48 +45,72 @@ class CommerceOrderHistoryDataSource extends DataSource
         return $this->getReportWithLineItems();
     }
 
+    /**
+     * @param array $options
+     *
+     * @return null|string
+     * @throws \Twig_Error_Loader
+     * @throws \yii\base\Exception
+     * @throws \Exception
+     */
     public function getSettingsHtml(array $options = [])
     {
+        $settings = $this->report->getSettings();
+
         $defaultStartDate = null;
         $defaultEndDate = null;
 
-        $options = $this->report->getOptions();
+        if (count($settings)) {
+            if (isset($settings['startDate'])) {
+                $startDateValue = (array)$settings['startDate'];
 
-        if (!empty($options)) {
-            $options['startDate'] = DateTime::createFromString($this->report->getOption('startDate'), craft()->timezone);
-            $options['endDate'] = DateTime::createFromString($this->report->getOption('endDate'), craft()->timezone);
+                $settings['startDate'] = DateTimeHelper::toDateTime($startDateValue);
+            }
+
+            if (isset($settings['endDate'])) {
+                $endDateValue = (array)$settings['endDate'];
+
+                $settings['endDate'] = DateTimeHelper::toDateTime($endDateValue);
+            }
         }
 
-        return craft()->templates->render('sproutreportscommerce/datasources/orderhistory/_options', [
-            'options' => $options,
-            'defaultStartDate' => new DateTime($defaultStartDate),
-            'defaultEndDate' => new DateTime($defaultEndDate)
+
+        return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/orderhistory/_options', [
+            'defaultStartDate' => new \DateTime($defaultStartDate),
+            'defaultEndDate' => new \DateTime($defaultEndDate),
+            'options' => $settings
         ]);
     }
+
     /**
      * Aggregates all results into a single line with totals
-     *
-     * @return array|\CDbDataReader
+     * @return array
+     * @throws \Exception
      */
     protected function getReportWithCalculateTotals()
     {
-        $startDate = DateTime::createFromString($this->reportModel->getOption('startDate'), craft()->timezone);
-        $endDate = DateTime::createFromString($this->reportModel->getOption('endDate'), craft()->timezone);
+        /**
+         * @var $reportModel Report
+         */
+        $reportModel = $this->reportModel;
 
-        $query = craft()->db->createCommand()
-            ->select("SUM(orders.totalPaid) as totalRevenue")
+        $startDate = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
+        $endDate   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+
+        $query = new Query();
+        $query->select("SUM(orders.totalPaid) as totalRevenue")
             ->from('commerce_orders as orders');
 
         if ($startDate && $endDate) {
             $query->andWhere('orders.dateOrdered > :startDate', [
-                ':startDate' => DateTimeHelper::formatTimeForDb($startDate)
+                ':startDate' => $startDate->format('Y-m-d H:i:s')
             ]);
             $query->andWhere('orders.dateOrdered < :endDate', [
-                ':endDate' => DateTimeHelper::formatTimeForDb($endDate)
+                ':endDate' => $endDate->format('Y-m-d H:i:s')
             ]);
         }
 
-        $results = $query->queryAll();
+        $results = $query->all();
 
         if (!empty($results)) {
             foreach ($results as $key => $result) {
@@ -107,18 +131,24 @@ class CommerceOrderHistoryDataSource extends DataSource
         return $results;
     }
 
+
     /**
      * Returns a row for each order in a given time period
-     *
-     * @return array|\CDbDataReader
+     * @return array
+     * @throws \Exception
      */
     protected function getReportWithLineItems()
     {
-        $startDate = DateTime::createFromString($this->reportModel->getOption('startDate'), craft()->timezone);
-        $endDate = DateTime::createFromString($this->reportModel->getOption('endDate'), craft()->timezone);
+        /**
+         * @var $reportModel Report
+         */
+        $reportModel = $this->reportModel;
+        $startDate = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
+        $endDate   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
 
-        $query = craft()->db->createCommand()
-            ->select("orders.id as orderId, 
+        $query = new Query();
+
+        $query->select("orders.id as orderId, 
                       orders.number,
                       orders.totalPaid,
                       orders.dateOrdered")
@@ -126,16 +156,16 @@ class CommerceOrderHistoryDataSource extends DataSource
 
         if ($startDate && $endDate) {
             $query->andWhere('orders.dateOrdered > :startDate', [
-                ':startDate' => DateTimeHelper::formatTimeForDb($startDate)
+                ':startDate' => $startDate->format('Y-m-d H:i:s')
             ]);
             $query->andWhere('orders.dateOrdered < :endDate', [
-                ':endDate' => DateTimeHelper::formatTimeForDb($endDate)
+                ':endDate' => $endDate->format('Y-m-d H:i:s')
             ]);
         }
 
-        $query->order('dateOrdered DESC');
+        $query->orderBy(['dateOrdered' => SORT_DESC]);
 
-        $orders = $query->queryAll();
+        $orders = $query->all();
 
         if (!empty($orders)) {
             foreach ($orders as $key => $order) {
@@ -144,14 +174,14 @@ class CommerceOrderHistoryDataSource extends DataSource
 
                 $productRevenue = $orders[$key]['totalPaid'] - ($totalShipping + $totalTax);
 
-                $dateOrdered = DateTime::createFromString($order['dateOrdered']);
+                $dateOrdered = DateTimeHelper::toDateTime($order['dateOrdered']);
 
                 $orders[$key]['Order Number'] = substr($order['number'], 0, 7);
                 $orders[$key]['Product Revenue'] = number_format($productRevenue, 2);
                 $orders[$key]['Tax'] = number_format($totalTax, 2);
                 $orders[$key]['Shipping'] = number_format($totalShipping, 2);
                 $orders[$key]['Total Revenue'] = number_format($orders[$key]['totalPaid'], 2);
-                $orders[$key]['Date Ordered'] = $dateOrdered;
+                $orders[$key]['Date Ordered'] = $dateOrdered->format('Y-m-d H:i:s');
 
                 unset($orders[$key]['number']);
                 unset($orders[$key]['orderId']);
@@ -169,14 +199,20 @@ class CommerceOrderHistoryDataSource extends DataSource
      * @param null $order
      * @param      $type
      *
-     * @return bool|\CDbDataReader|mixed|string
+     * @return bool|false|null|string
+     * @throws \Exception
      */
     private function getTotalAdjustmentByType($order = null, $type)
     {
         $orderId = $order['orderId'];
 
-        $query = craft()->db->createCommand()
-            ->select('SUM(orderadjustments.amount)')
+        /**
+         * @var $reportModel Report
+         */
+        $reportModel = $this->reportModel;
+
+        $query = new Query();
+            $query->select('SUM(orderadjustments.amount)')
             ->from('commerce_orders as orders')
             ->leftJoin('commerce_orderadjustments as orderadjustments', 'orders.id = orderadjustments.orderId')
             ->where("orderadjustments.type = '$type'");
@@ -188,25 +224,30 @@ class CommerceOrderHistoryDataSource extends DataSource
             ]);
         } else {
             // For Aggregate Order History Report
-            $startDate = DateTime::createFromString($this->reportModel->getOption('startDate'), craft()->timezone);
-            $endDate = DateTime::createFromString($this->reportModel->getOption('endDate'), craft()->timezone);
+            $startDate = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
+            $endDate = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
 
             $query->andWhere('orders.dateOrdered > :startDate', [
-                ':startDate' => DateTimeHelper::formatTimeForDb($startDate)
+                ':startDate' => $startDate->format('Y-m-d H:i:s')
             ]);
             $query->andWhere('orders.dateOrdered < :endDate', [
-                ':endDate' => DateTimeHelper::formatTimeForDb($endDate)
+                ':endDate' => $endDate->format('Y-m-d H:i:s')
             ]);
         }
 
-        return $query->queryScalar();
+        return $query->scalar();
     }
 
+    /**
+     * @param $options
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     public function prepOptions($options)
     {
-
-        $options['startDate'] = DateTime::createFromString($options['startDate']);
-        $options['endDate'] = DateTime::createFromString($options['endDate']);
+        $options['startDate'] = DateTimeHelper::toDateTime($options['startDate']);
+        $options['endDate'] = DateTimeHelper::toDateTime($options['endDate']);
 
         return $options;
     }
