@@ -60,7 +60,7 @@ class CommerceOrderHistoryDataSource extends DataSource
         $defaultStartDate = null;
         $defaultEndDate = null;
 
-        if (count($settings)) {
+        if ($settings !== null) {
             if (isset($settings['startDate'])) {
                 $startDateValue = (array)$settings['startDate'];
 
@@ -74,11 +74,10 @@ class CommerceOrderHistoryDataSource extends DataSource
             }
         }
 
-
-        return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/orderhistory/_options', [
+        return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/orderhistory/_settings', [
             'defaultStartDate' => new \DateTime($defaultStartDate),
             'defaultEndDate' => new \DateTime($defaultEndDate),
-            'options' => $settings
+            'settings' => $settings
         ]);
     }
 
@@ -99,7 +98,7 @@ class CommerceOrderHistoryDataSource extends DataSource
 
         $query = new Query();
         $query->select("SUM(orders.totalPaid) as totalRevenue")
-            ->from('commerce_orders as orders');
+            ->from('{{%commerce_orders}} as orders');
 
         if ($startDate && $endDate) {
             $query->andWhere('orders.dateOrdered > :startDate', [
@@ -143,21 +142,29 @@ class CommerceOrderHistoryDataSource extends DataSource
          * @var $reportModel Report
          */
         $reportModel = $this->reportModel;
-        $startDate = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
-        $endDate   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
 
+        $startDateSetting = $reportModel->getSetting('startDate');
+        $endDateSetting = $reportModel->getSetting('endDate');
+
+
+        $timeZone =  new \DateTimeZone('UTC');
+        $startDate = DateTimeHelper::toDateTime($startDateSetting)->setTimezone($timeZone);
+        $endDate   = DateTimeHelper::toDateTime($endDateSetting)->setTimezone($timeZone);
+        
         $query = new Query();
 
         $query->select("orders.id as orderId, 
                       orders.number,
                       orders.totalPaid,
                       orders.dateOrdered")
-            ->from('commerce_orders as orders');
+            ->from('{{%commerce_orders}} as orders');
+
 
         if ($startDate && $endDate) {
             $query->andWhere('orders.dateOrdered > :startDate', [
                 ':startDate' => $startDate->format('Y-m-d H:i:s')
             ]);
+
             $query->andWhere('orders.dateOrdered < :endDate', [
                 ':endDate' => $endDate->format('Y-m-d H:i:s')
             ]);
@@ -213,8 +220,8 @@ class CommerceOrderHistoryDataSource extends DataSource
 
         $query = new Query();
             $query->select('SUM(orderadjustments.amount)')
-            ->from('commerce_orders as orders')
-            ->leftJoin('commerce_orderadjustments as orderadjustments', 'orders.id = orderadjustments.orderId')
+            ->from('{{%commerce_orders}} as orders')
+            ->leftJoin('{{%commerce_orderadjustments}} as orderadjustments', 'orders.id = orderadjustments.orderId')
             ->where("orderadjustments.type = '$type'");
 
         if ($orderId != null) {

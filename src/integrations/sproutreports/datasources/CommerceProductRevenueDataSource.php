@@ -48,7 +48,7 @@ class CommerceProductRevenueDataSource extends DataSource
 
         $settings = $report->getSettings();
 
-        if (count($settings)) {
+        if ($settings !== null) {
             if (isset($settings['startDate'])) {
                 $startDateValue = (array)$settings['startDate'];
 
@@ -62,8 +62,8 @@ class CommerceProductRevenueDataSource extends DataSource
             }
         }
 
-        return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/productrevenue/_options', [
-            'options' => $settings,
+        return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/productrevenue/_settings', [
+            'settings' => $settings,
             'defaultStartDate' => new \DateTime($defaultStartDate),
             'defaultEndDate' => new \DateTime($defaultEndDate)
         ]);
@@ -90,7 +90,7 @@ class CommerceProductRevenueDataSource extends DataSource
         $endDate   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
 
         // First, use dynamic options, fallback to report options
-        if (!count($settings)) {
+        if ($settings !== null) {
             $options = $report->getSettings();
             $displayVariants = $options['variants'];
         }
@@ -114,10 +114,10 @@ class CommerceProductRevenueDataSource extends DataSource
                               FORMAT(SUM(lineitems.salePrice * lineitems.qty), 2) as \'Product Revenue\',
                               SUM(lineitems.qty) as \'Quantity Sold\',
                               variants.sku as SKU')
-            ->from('commerce_orders as orders')
-            ->leftJoin('commerce_lineitems as lineitems', 'orders.id = lineitems.orderId')
-            ->leftJoin('commerce_variants as variants', 'lineitems.purchasableId = variants.id')
-            ->leftJoin('commerce_products as products', 'variants.productId = products.id');
+            ->from('{{%commerce_orders}} as orders')
+            ->leftJoin('{{%commerce_lineitems}} as lineitems', 'orders.id = lineitems.orderId')
+            ->leftJoin('{{%commerce_variants}} as variants', 'lineitems.purchasableId = variants.id')
+            ->leftJoin('{{%commerce_products}} as products', 'variants.productId = products.id');
 
         if ($startDate && $endDate) {
             $query->andWhere('orders.dateOrdered > :startDate', [':startDate' => $startDate->format('Y-m-d H:i:s')]);

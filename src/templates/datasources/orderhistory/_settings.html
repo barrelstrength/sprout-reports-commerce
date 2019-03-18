@@ -4,8 +4,8 @@
 	label: "Start Date"|t,
 	instructions: "The start date of the date range you wish to display in your report."|t,
 	id: 'startDate',
-	name: 'options[startDate]',
-	value: options.startDate is defined ? options.startDate : defaultStartDate,
+	name: 'settings[startDate]',
+	value: settings.startDate is defined ? settings.startDate : defaultStartDate,
 	first: true
 }) }}
 
@@ -13,13 +13,13 @@
 	label: "End Date"|t,
 	instructions: "The end date of the date range you wish to display in your report."|t,
 	id: 'endDate',
-	name: 'options[endDate]',
-	value: options.endDate is defined ? options.endDate : defaultStartDate
+	name: 'settings[endDate]',
+	value: settings.endDate is defined ? settings.endDate : defaultStartDate
 }) }}
 
 {{ forms.lightswitchField({
 	label: "Calculate Total"|t,
 	instructions: "Display the sum of all results as a single line."|t,
-	name: 'options[calculateTotals]',
-	on: options.calculateTotals is defined ? options.calculateTotals : null
+	name: 'settings[calculateTotals]',
+	on: settings.calculateTotals is defined ? settings.calculateTotals : null
 }) }}

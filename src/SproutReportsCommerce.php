@@ -3,7 +3,8 @@
 namespace barrelstrength\sproutreportscommerce;
 
 use barrelstrength\sproutbasereports\services\DataSources;
-use barrelstrength\sproutreportscategories\integrations\sproutreports\datasources\Categories;
+use barrelstrength\sproutreportscommerce\integrations\sproutreports\datasources\CommerceOrderHistoryDataSource;
+use barrelstrength\sproutreportscommerce\integrations\sproutreports\datasources\CommerceProductRevenueDataSource;
 use craft\base\Plugin;
 use yii\base\Event;
 use craft\events\RegisterComponentTypesEvent;
@@ -40,7 +41,8 @@ class SproutReportsCommerce extends Plugin
         parent::init();
 
         Event::on(DataSources::class, DataSources::EVENT_REGISTER_DATA_SOURCES, function(RegisterComponentTypesEvent $event) {
-            $event->types[] = Categories::class;
+            $event->types[] = CommerceOrderHistoryDataSource::class;
+            $event->types[] = CommerceProductRevenueDataSource::class;
         });
     }
 }
