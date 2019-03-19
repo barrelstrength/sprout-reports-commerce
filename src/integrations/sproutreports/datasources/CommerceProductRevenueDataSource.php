@@ -4,6 +4,7 @@ namespace barrelstrength\sproutreportscommerce\integrations\sproutreports\dataso
 
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
+use barrelstrength\sproutbasereports\SproutBaseReports;
 use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
 use craft\helpers\DateTimeHelper;
@@ -86,8 +87,11 @@ class CommerceProductRevenueDataSource extends DataSource
          */
         $reportModel = $this->report;
 
-        $startDate = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
-        $endDate   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+        $startDateSetting = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
+        $endDateSetting   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+
+        $startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
+        $endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
 
         // First, use dynamic options, fallback to report options
         if ($settings !== null) {

@@ -4,6 +4,7 @@ namespace barrelstrength\sproutreportscommerce\integrations\sproutreports\dataso
 
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
+use barrelstrength\sproutbasereports\SproutBaseReports;
 use craft\helpers\DateTimeHelper;
 use craft\db\Query;
 use Craft;
@@ -93,8 +94,11 @@ class CommerceOrderHistoryDataSource extends DataSource
          */
         $reportModel = $this->reportModel;
 
-        $startDate = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
-        $endDate   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+        $startDateSetting = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
+        $endDateSetting   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+
+        $startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
+        $endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
 
         $query = new Query();
         $query->select("SUM(orders.totalPaid) as totalRevenue")
@@ -146,10 +150,8 @@ class CommerceOrderHistoryDataSource extends DataSource
         $startDateSetting = $reportModel->getSetting('startDate');
         $endDateSetting = $reportModel->getSetting('endDate');
 
-
-        $timeZone =  new \DateTimeZone('UTC');
-        $startDate = DateTimeHelper::toDateTime($startDateSetting)->setTimezone($timeZone);
-        $endDate   = DateTimeHelper::toDateTime($endDateSetting)->setTimezone($timeZone);
+        $startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
+        $endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
         
         $query = new Query();
 
@@ -231,8 +233,11 @@ class CommerceOrderHistoryDataSource extends DataSource
             ]);
         } else {
             // For Aggregate Order History Report
-            $startDate = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
-            $endDate = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+            $startDateSetting = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
+            $endDateSetting = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+
+            $startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
+            $endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
 
             $query->andWhere('orders.dateOrdered > :startDate', [
                 ':startDate' => $startDate->format('Y-m-d H:i:s')
