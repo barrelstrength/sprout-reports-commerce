@@ -33,8 +33,6 @@ class CommerceProductRevenueDataSource extends DataSource
      * @param array $options
      *
      * @return null|string
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
      * @throws \Exception
      */
     public function getSettingsHtml(array $options = [])
@@ -98,25 +96,18 @@ class CommerceProductRevenueDataSource extends DataSource
             $options = $report->getSettings();
             $displayVariants = $options['variants'];
         }
-
-
-/*        @todo find out why we are querying criteria here
-        $criteria = $criteria = craft()->elements->getCriteria('Commerce_Order');
-        $criteria->limit = null;
-
-        // Don't use the search
-        $criteria->search = null;*/
+        
         $query = new Query();
-        $query->select('variants.id as \'Variants ID\', 
-                              products.id as \'Product ID\',
-                              orders.id as \'Order ID\',
-                              FORMAT(SUM(lineitems.total), 2) as \'Line Item Revenue\',
-                              SUM(lineitems.discount) as \'Line Item Discount\',
-                              SUM(lineitems.shippingCost) as \'Line Item Shipping Cost\',
-                              SUM(lineitems.taxIncluded) as \'Line Item Tax Included\',
-                              SUM(lineitems.tax) as \'Line Item Tax\',
-                              FORMAT(SUM(lineitems.salePrice * lineitems.qty), 2) as \'Product Revenue\',
-                              SUM(lineitems.qty) as \'Quantity Sold\',
+        $query->select('
+                              variants.id as variantId,
+                              products.id as productId,
+                              orders.id as orderId,
+                              lineitems.id as lineItemId,
+                              SUM(lineitems.total) as total,
+                              SUM(lineitems.saleAmount) as saleAmount,                            
+                          
+                              SUM(lineitems.salePrice * lineitems.qty) as productRevenue,
+                              SUM(lineitems.qty) as quantitySold,
                               variants.sku as SKU')
             ->from('{{%commerce_orders}} as orders')
             ->leftJoin('{{%commerce_lineitems}} as lineitems', 'orders.id = lineitems.orderId')
@@ -137,11 +128,25 @@ class CommerceProductRevenueDataSource extends DataSource
         $query->orderBy(['products.id' => SORT_DESC]);
 
         $results = $query->all();
-
+        $rows = [];
         if ($results) {
             foreach ($results as $key => $result) {
-                $productId = $result['Product ID'];
-                $variantId = $result['Variants ID'];
+                $lineItemId = $result['lineItemId'];
+                $lineItem = \craft\commerce\Plugin::getInstance()->lineItems->getLineItemById($lineItemId);
+
+                $productId = $result['productId'];
+                $variantId = $result['variantId'];
+                $rows[$key]['Variant ID'] = $variantId;
+                $rows[$key]['Product ID'] = $productId;
+                $rows[$key]['Order ID'] = $result['orderId'];
+                $rows[$key]['Line Item Revenue'] = number_format($result['total'], 2);
+                $rows[$key]['Sale Amount'] = number_format($result['saleAmount'], 2);
+                $rows[$key]['Shipping Cost'] = number_format($lineItem->getAdjustmentsTotalByType('shipping'), 2);
+                $rows[$key]['Tax'] = number_format($lineItem->getAdjustmentsTotalByType('tax'), 2);
+                $rows[$key]['Product Revenue'] = number_format($result['productRevenue'], 2);
+                $rows[$key]['Quantity Sold'] = $result['quantitySold'];
+                $rows[$key]['SKU'] = $result['SKU'];
+
                 /**
                  * @var $productElement Product
                  */
@@ -154,28 +159,23 @@ class CommerceProductRevenueDataSource extends DataSource
                     $variantElement = Craft::$app->elements->getElementById($variantId);
 
                     if ($variantElement) {
-                        $results[$key]['Variant Title'] = $variantElement->title;
+                        $rows[$key]['Variant Title'] = $variantElement->title;
                     } else {
-                        $results[$key]['Variant Title'] = Craft::t('sprout-reports-commerce', 'Variant has been deleted');
+                        $rows[$key]['Variant Title'] = Craft::t('sprout-reports-commerce', 'Variant has been deleted');
                     }
                 }
 
                 if ($productElement) {
-                    $results[$key]['Product Title'] = $productElement->title;
+                    $rows[$key]['Product Title'] = $productElement->title;
                 } else {
-                    $results[$key]['Product Title'] = Craft::t('sprout-reports-commerce','Product has been deleted');
+                    $rows[$key]['Product Title'] = Craft::t('sprout-reports-commerce','Product has been deleted');
                 }
 
-                // Do not display IDs
-                unset($results[$key]['Product ID']);
-                unset($results[$key]['Variants ID']);
-                unset($results[$key]['Order ID']);
-
-                $results[$key] = array_reverse($results[$key], true);
+               $rows[$key] = array_reverse($rows[$key], true);
             }
         }
 
-        return $results;
+        return $rows;
     }
 
     /**
