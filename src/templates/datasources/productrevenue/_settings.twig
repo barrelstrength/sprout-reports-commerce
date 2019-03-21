@@ -1,0 +1,29 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.dateTimeField({
+    label: "Start Date"|t,
+    instructions: "The start date of the date range you wish to display in your report."|t,
+    id: 'startDate',
+    name: 'settings[startDate]',
+    value: settings.startDate is defined ? settings.startDate : defaultStartDate,
+    first: true
+}) }}
+
+{{ forms.dateTimeField({
+    label: "End Date"|t,
+    instructions: "The end date of the date range you wish to display in your report."|t,
+    id: 'endDate',
+    name: 'settings[endDate]',
+    value: settings.endDate is defined ? settings.endDate : defaultStartDate
+}) }}
+
+{{ forms.lightswitchField({
+    label: "Display Variants as Individual Products"|t,
+    instructions: "List all product variants as individual rows on the report. i.e. A product with three variants will
+    display as three lines instead of one."|t,
+    id: 'variants',
+    name: 'settings[variants]',
+    on:  settings.variants is defined ? settings.variants : null,
+    onLabel: "Enable"|t,
+    offLabel: "Disable"|t
+}) }}

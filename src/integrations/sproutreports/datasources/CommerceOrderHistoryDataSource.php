@@ -75,9 +75,12 @@ class CommerceOrderHistoryDataSource extends DataSource
             }
         }
 
+        $dateRanges = SproutBaseReports::$app->reports->getDateRanges();
+
         return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/orderhistory/_settings', [
             'defaultStartDate' => new \DateTime($defaultStartDate),
             'defaultEndDate' => new \DateTime($defaultEndDate),
+            'dateRanges' => $dateRanges,
             'settings' => $settings
         ]);
     }
@@ -105,10 +108,10 @@ class CommerceOrderHistoryDataSource extends DataSource
             ->from('{{%commerce_orders}} as orders');
 
         if ($startDate && $endDate) {
-            $query->andWhere('orders.dateOrdered > :startDate', [
+            $query->andWhere('orders.dateOrdered >= :startDate', [
                 ':startDate' => $startDate->format('Y-m-d H:i:s')
             ]);
-            $query->andWhere('orders.dateOrdered < :endDate', [
+            $query->andWhere('orders.dateOrdered <= :endDate', [
                 ':endDate' => $endDate->format('Y-m-d H:i:s')
             ]);
         }
@@ -163,11 +166,11 @@ class CommerceOrderHistoryDataSource extends DataSource
 
 
         if ($startDate && $endDate) {
-            $query->andWhere('orders.dateOrdered > :startDate', [
+            $query->andWhere('orders.dateOrdered >= :startDate', [
                 ':startDate' => $startDate->format('Y-m-d H:i:s')
             ]);
 
-            $query->andWhere('orders.dateOrdered < :endDate', [
+            $query->andWhere('orders.dateOrdered <= :endDate', [
                 ':endDate' => $endDate->format('Y-m-d H:i:s')
             ]);
         }
@@ -239,10 +242,10 @@ class CommerceOrderHistoryDataSource extends DataSource
             $startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
             $endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
 
-            $query->andWhere('orders.dateOrdered > :startDate', [
+            $query->andWhere('orders.dateOrdered >= :startDate', [
                 ':startDate' => $startDate->format('Y-m-d H:i:s')
             ]);
-            $query->andWhere('orders.dateOrdered < :endDate', [
+            $query->andWhere('orders.dateOrdered <= :endDate', [
                 ':endDate' => $endDate->format('Y-m-d H:i:s')
             ]);
         }

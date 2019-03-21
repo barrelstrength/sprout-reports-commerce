@@ -96,7 +96,7 @@ class CommerceProductRevenueDataSource extends DataSource
             $options = $report->getSettings();
             $displayVariants = $options['variants'];
         }
-        
+
         $query = new Query();
         $query->select('
                               variants.id as variantId,
@@ -115,8 +115,8 @@ class CommerceProductRevenueDataSource extends DataSource
             ->leftJoin('{{%commerce_products}} as products', 'variants.productId = products.id');
 
         if ($startDate && $endDate) {
-            $query->andWhere('orders.dateOrdered > :startDate', [':startDate' => $startDate->format('Y-m-d H:i:s')]);
-            $query->andWhere('orders.dateOrdered < :endDate', [':endDate' => $endDate->format('Y-m-d H:i:s')]);
+            $query->andWhere('orders.dateOrdered >= :startDate', [':startDate' => $startDate->format('Y-m-d H:i:s')]);
+            $query->andWhere('orders.dateOrdered <= :endDate', [':endDate' => $endDate->format('Y-m-d H:i:s')]);
         }
 
         if (!empty($displayVariants)) {
