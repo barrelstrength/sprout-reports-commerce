@@ -79,9 +79,9 @@ class CommerceOrderHistoryDataSource extends DataSource
 
         return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/orderhistory/_settings', [
             'defaultStartDate' => new \DateTime($defaultStartDate),
-            'defaultEndDate' => new \DateTime($defaultEndDate),
-            'dateRanges' => $dateRanges,
-            'settings' => $settings
+            'defaultEndDate'   => new \DateTime($defaultEndDate),
+            'dateRanges'       => $dateRanges,
+            'settings'         => $settings
         ]);
     }
 
@@ -97,11 +97,10 @@ class CommerceOrderHistoryDataSource extends DataSource
          */
         $reportModel = $this->reportModel;
 
-        $startDateSetting = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
-        $endDateSetting   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+        $startEndDate = $reportModel->getStartEndDate();
 
-        $startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
-        $endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
+        $startDate = $startEndDate->getStartDate();
+        $endDate   = $startEndDate->getEndDate();
 
         $query = new Query();
         $query->select("SUM(orders.totalPaid) as totalRevenue")
@@ -150,12 +149,11 @@ class CommerceOrderHistoryDataSource extends DataSource
          */
         $reportModel = $this->reportModel;
 
-        $startDateSetting = $reportModel->getSetting('startDate');
-        $endDateSetting = $reportModel->getSetting('endDate');
+        $startEndDate = $reportModel->getStartEndDate();
 
-        $startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
-        $endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
-        
+        $startDate = $startEndDate->getStartDate();
+        $endDate   = $startEndDate->getEndDate();
+
         $query = new Query();
 
         $query->select("orders.id as orderId, 
@@ -236,11 +234,10 @@ class CommerceOrderHistoryDataSource extends DataSource
             ]);
         } else {
             // For Aggregate Order History Report
-            $startDateSetting = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
-            $endDateSetting = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+            $startEndDate = $reportModel->getStartEndDate();
 
-            $startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
-            $endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
+            $startDate = $startEndDate->getStartDate();
+            $endDate   = $startEndDate->getEndDate();
 
             $query->andWhere('orders.dateOrdered >= :startDate', [
                 ':startDate' => $startDate->format('Y-m-d H:i:s')
