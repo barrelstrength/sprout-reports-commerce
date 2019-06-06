@@ -1,5 +1,15 @@
 {% import "_includes/forms" as forms %}
 
+{{ forms.selectField({
+    id: "dateRange",
+    name: "settings[dateRange]",
+    label: "Date Ranges",
+    fieldClass: 'field-border-top',
+    options: dateRanges,
+    value: settings.dateRange is defined ? settings.dateRange : null
+}) }}
+
+<div id="custom-date-range">
 {{ forms.dateTimeField({
     label: "Start Date"|t,
     instructions: "The start date of the date range you wish to display in your report."|t,
@@ -16,6 +26,7 @@
     name: 'settings[endDate]',
     value: settings.endDate is defined ? settings.endDate : defaultStartDate
 }) }}
+</div>
 
 {{ forms.lightswitchField({
     label: "Display Variants as Individual Products"|t,

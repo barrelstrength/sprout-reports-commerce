@@ -61,10 +61,13 @@ class CommerceProductRevenueDataSource extends DataSource
             }
         }
 
+        $dateRanges = SproutBaseReports::$app->reports->getDateRanges();
+
         return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/productrevenue/_settings', [
             'settings' => $settings,
             'defaultStartDate' => new \DateTime($defaultStartDate),
-            'defaultEndDate' => new \DateTime($defaultEndDate)
+            'defaultEndDate' => new \DateTime($defaultEndDate),
+            'dateRanges' => $dateRanges
         ]);
     }
 
@@ -85,12 +88,10 @@ class CommerceProductRevenueDataSource extends DataSource
          */
         $reportModel = $this->report;
 
-        $startDateSetting = DateTimeHelper::toDateTime($reportModel->getSetting('startDate'));
-        $endDateSetting   = DateTimeHelper::toDateTime($reportModel->getSetting('endDate'));
+        $startEndDate = $reportModel->getStartEndDate();
 
-        $startDate = SproutBaseReports::$app->reports->getUtcDateTime($startDateSetting);
-        $endDate   = SproutBaseReports::$app->reports->getUtcDateTime($endDateSetting);
-
+        $startDate = $startEndDate->getStartDate();
+        $endDate   = $startEndDate->getEndDate();
         // First, use dynamic options, fallback to report options
         if ($settings !== null) {
             $options = $report->getSettings();
@@ -99,31 +100,24 @@ class CommerceProductRevenueDataSource extends DataSource
 
         $query = new Query();
         $query->select('
-                              variants.id as variantId,
-                              products.id as productId,
-                              orders.id as orderId,
-                              lineitems.id as lineItemId,
-                              SUM(lineitems.total) as total,
-                              SUM(lineitems.saleAmount) as saleAmount,                            
-                          
-                              SUM(lineitems.salePrice * lineitems.qty) as productRevenue,
-                              SUM(lineitems.qty) as quantitySold,
-                              variants.sku as SKU')
-            ->from('{{%commerce_orders}} as orders')
-            ->leftJoin('{{%commerce_lineitems}} as lineitems', 'orders.id = lineitems.orderId')
-            ->leftJoin('{{%commerce_variants}} as variants', 'lineitems.purchasableId = variants.id')
-            ->leftJoin('{{%commerce_products}} as products', 'variants.productId = products.id');
+            variants.id as variantId,
+            products.id as productId,
+            SUM(lineitems.total) as total,
+            SUM(lineitems.saleAmount) as saleAmount,
+            SUM(lineitems.salePrice * lineitems.qty) as productRevenue,
+            SUM(lineitems.qty) as quantitySold,
+            variants.sku as SKU')
+            ->from('commerce_orders as orders')
+            ->leftJoin('commerce_lineitems as lineitems', 'orders.id = lineitems.orderId')
+            ->leftJoin('commerce_variants as variants', 'lineitems.purchasableId = variants.id')
+            ->leftJoin('commerce_products as products', 'variants.productId = products.id');
 
         if ($startDate && $endDate) {
             $query->andWhere('orders.dateOrdered >= :startDate', [':startDate' => $startDate->format('Y-m-d H:i:s')]);
             $query->andWhere('orders.dateOrdered <= :endDate', [':endDate' => $endDate->format('Y-m-d H:i:s')]);
         }
 
-        if (!empty($displayVariants)) {
-            $query->groupBy('lineitems.purchasableId');
-        } else {
-            $query->groupBy('products.id');
-        }
+        $query->groupBy('variantId');
 
         $query->orderBy(['products.id' => SORT_DESC]);
 
@@ -131,18 +125,17 @@ class CommerceProductRevenueDataSource extends DataSource
         $rows = [];
         if ($results) {
             foreach ($results as $key => $result) {
-                $lineItemId = $result['lineItemId'];
-                $lineItem = \craft\commerce\Plugin::getInstance()->lineItems->getLineItemById($lineItemId);
+                #$lineItemId = $result['lineItemId'];
+                #$lineItem = \craft\commerce\Plugin::getInstance()->lineItems->getLineItemById($lineItemId);
 
                 $productId = $result['productId'];
                 $variantId = $result['variantId'];
                 $rows[$key]['Variant ID'] = $variantId;
                 $rows[$key]['Product ID'] = $productId;
-                $rows[$key]['Order ID'] = $result['orderId'];
                 $rows[$key]['Line Item Revenue'] = number_format($result['total'], 2);
                 $rows[$key]['Sale Amount'] = number_format($result['saleAmount'], 2);
-                $rows[$key]['Shipping Cost'] = number_format($lineItem->getAdjustmentsTotalByType('shipping'), 2);
-                $rows[$key]['Tax'] = number_format($lineItem->getAdjustmentsTotalByType('tax'), 2);
+                #$rows[$key]['Shipping Cost'] = number_format($lineItem->getAdjustmentsTotalByType('shipping'), 2);
+                #$rows[$key]['Tax'] = number_format($lineItem->getAdjustmentsTotalByType('tax'), 2);
                 $rows[$key]['Product Revenue'] = number_format($result['productRevenue'], 2);
                 $rows[$key]['Quantity Sold'] = $result['quantitySold'];
                 $rows[$key]['SKU'] = $result['SKU'];
