@@ -19,10 +19,10 @@
     ],
     "support": {
         "email": "sprout@barrelstrengthdesign.com",
-        "issues": "https://github.com/barrelstrength/sprout-reports/issues?state=open",
-        "source": "https://github.com/barrelstrength/sprout-reports",
-        "docs": "https://sprout.barrelstrengthdesign.com/craft-plugins/reports/docs",
-        "rss": "https://github.com/barrelstrength/sprout-reports/commits/v2.atom"
+        "issues": "https://github.com/barrelstrength/sprout-reports-commerce/issues?state=open",
+        "source": "https://github.com/barrelstrength/sprout-reports-commerce",
+        "docs": "https://sprout.barrelstrengthdesign.com/docs/reports",
+        "rss": "https://github.com/barrelstrength/sprout-reports-commerce/commits/v2.atom"
     },
     "require": {
         "craftcms/cms": "^3.1.0",
@@ -38,9 +38,7 @@
         "handle": "sprout-reports-commerce",
         "developer": "Barrel Strength",
         "developerUrl": "https://barrelstrengthdesign.com",
-        "documentationUrl": "https://sprout.barrelstrengthdesign.com/craft-plugins/reports",
-        "changelogUrl": "https://raw.githubusercontent.com/BarrelStrength/sprout-reports-categories/master/CHANGELOG.md",
-        "downloadUrl": "https://github.com/BarrelStrength/sprout-reports-categories/archive/master.zip",
+        "documentationUrl": "https://sprout.barrelstrengthdesign.com/docs/reports",
         "class": "barrelstrength\\sproutreportscommerce\\SproutReportsCommerce"
     }
 }
