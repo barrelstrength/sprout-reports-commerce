@@ -42,9 +42,6 @@ class CommerceProductRevenueDataSource extends DataSource
         $defaultStartDate = null;
         $defaultEndDate = null;
 
-        /**
-         * @var $report Report
-         */
         $report = $this->report;
 
         $settings = $report->getSettings();
@@ -86,12 +83,8 @@ class CommerceProductRevenueDataSource extends DataSource
     public function getResults(Report $report, array $settings = []): array
     {
         $displayVariants = false;
-        /**
-         * @var $reportModel Report
-         */
-        $reportModel = $this->report;
 
-        $startEndDate = $reportModel->getStartEndDate();
+        $startEndDate = $report->getStartEndDate();
 
         $startDate = $startEndDate->getStartDate();
         $endDate = $startEndDate->getEndDate();
