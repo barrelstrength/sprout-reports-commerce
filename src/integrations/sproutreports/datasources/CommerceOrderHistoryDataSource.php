@@ -27,6 +27,7 @@ class CommerceOrderHistoryDataSource extends DataSource
     /**
      *
      * Gets the results for the Order History Report
+     *
      * @param Report $report
      * @param array  $settings
      *
@@ -79,14 +80,15 @@ class CommerceOrderHistoryDataSource extends DataSource
 
         return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/orderhistory/_settings', [
             'defaultStartDate' => new \DateTime($defaultStartDate),
-            'defaultEndDate'   => new \DateTime($defaultEndDate),
-            'dateRanges'       => $dateRanges,
-            'settings'         => $settings
+            'defaultEndDate' => new \DateTime($defaultEndDate),
+            'dateRanges' => $dateRanges,
+            'settings' => $settings
         ]);
     }
 
     /**
      * Aggregates all results into a single line with totals
+     *
      * @return array
      * @throws \Exception
      */
@@ -100,7 +102,7 @@ class CommerceOrderHistoryDataSource extends DataSource
         $startEndDate = $reportModel->getStartEndDate();
 
         $startDate = $startEndDate->getStartDate();
-        $endDate   = $startEndDate->getEndDate();
+        $endDate = $startEndDate->getEndDate();
 
         $query = new Query();
         $query->select("SUM([[orders.totalPaid]]) as totalRevenue")
@@ -135,6 +137,7 @@ class CommerceOrderHistoryDataSource extends DataSource
 
     /**
      * Returns a row for each order in a given time period
+     *
      * @return array
      * @throws \Exception
      */
@@ -148,7 +151,7 @@ class CommerceOrderHistoryDataSource extends DataSource
         $startEndDate = $reportModel->getStartEndDate();
 
         $startDate = $startEndDate->getStartDate();
-        $endDate   = $startEndDate->getEndDate();
+        $endDate = $startEndDate->getEndDate();
 
         $query = new Query();
 
@@ -213,7 +216,7 @@ class CommerceOrderHistoryDataSource extends DataSource
         $reportModel = $this->reportModel;
 
         $query = new Query();
-            $query->select('SUM([[orderadjustments.amount]])')
+        $query->select('SUM([[orderadjustments.amount]])')
             ->from('{{%commerce_orders}} as orders')
             ->leftJoin('{{%commerce_orderadjustments}} as orderadjustments', '[[orders.id]] = [[orderadjustments.orderId]]')
             ->where("[[orderadjustments.type]] = '$type'");
@@ -226,7 +229,7 @@ class CommerceOrderHistoryDataSource extends DataSource
             $startEndDate = $reportModel->getStartEndDate();
 
             $startDate = $startEndDate->getStartDate();
-            $endDate   = $startEndDate->getEndDate();
+            $endDate = $startEndDate->getEndDate();
 
             $query->andWhere(['>=', 'orders.dateOrdered  :startDate', $startDate->format('Y-m-d H:i:s')]);
             $query->andWhere(['<=', 'orders.dateOrdered', $endDate->format('Y-m-d H:i:s')]);

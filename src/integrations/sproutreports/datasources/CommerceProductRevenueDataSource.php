@@ -18,7 +18,7 @@ class CommerceProductRevenueDataSource extends DataSource
      */
     public static function displayName(): string
     {
-        return Craft::t('sprout-reports-commerce','Commerce Product Revenue');
+        return Craft::t('sprout-reports-commerce', 'Commerce Product Revenue');
     }
 
     /**
@@ -26,7 +26,7 @@ class CommerceProductRevenueDataSource extends DataSource
      */
     public function getDescription(): string
     {
-        return Craft::t('sprout-reports-commerce','Create sales reports for your products and variants.');
+        return Craft::t('sprout-reports-commerce', 'Create sales reports for your products and variants.');
     }
 
     /**
@@ -74,6 +74,7 @@ class CommerceProductRevenueDataSource extends DataSource
     /**
      *
      * Gets the results for the Order History Report
+     *
      * @param Report $report
      * @param array  $settings
      *
@@ -91,7 +92,7 @@ class CommerceProductRevenueDataSource extends DataSource
         $startEndDate = $reportModel->getStartEndDate();
 
         $startDate = $startEndDate->getStartDate();
-        $endDate   = $startEndDate->getEndDate();
+        $endDate = $startEndDate->getEndDate();
         // First, use dynamic options, fallback to report options
         if ($settings !== null) {
             $options = $report->getSettings();
@@ -163,10 +164,10 @@ class CommerceProductRevenueDataSource extends DataSource
                 if ($productElement) {
                     $rows[$key]['Product Title'] = $productElement->title;
                 } else {
-                    $rows[$key]['Product Title'] = Craft::t('sprout-reports-commerce','Product has been deleted');
+                    $rows[$key]['Product Title'] = Craft::t('sprout-reports-commerce', 'Product has been deleted');
                 }
 
-               $rows[$key] = array_reverse($rows[$key], true);
+                $rows[$key] = array_reverse($rows[$key], true);
             }
         }
 
