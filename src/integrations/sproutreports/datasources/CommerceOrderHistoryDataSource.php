@@ -8,17 +8,32 @@ use barrelstrength\sproutbasereports\SproutBaseReports;
 use craft\helpers\DateTimeHelper;
 use craft\db\Query;
 use Craft;
+use DateTime;
+use Exception;
 
+/**
+ *
+ * @property array $reportWithCalculateTotals
+ * @property array $reportWithLineItems
+ */
 class CommerceOrderHistoryDataSource extends DataSource
 {
-
+    /**
+     * @var Report
+     */
     private $reportModel;
 
+    /**
+     * @return string
+     */
     public static function displayName(): string
     {
         return Craft::t('sprout-reports-commerce', 'Commerce Order History');
     }
 
+    /**
+     * @return string
+     */
     public function getDescription(): string
     {
         return Craft::t('sprout-reports-commerce', 'Displays all orders by date range');
@@ -32,7 +47,7 @@ class CommerceOrderHistoryDataSource extends DataSource
      * @param array  $settings
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getResults(Report $report, array $settings = []): array
     {
@@ -51,9 +66,7 @@ class CommerceOrderHistoryDataSource extends DataSource
      * @param array $options
      *
      * @return null|string
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
-     * @throws \Exception
+     * @throws Exception
      */
     public function getSettingsHtml(array $options = [])
     {
@@ -79,8 +92,8 @@ class CommerceOrderHistoryDataSource extends DataSource
         $dateRanges = SproutBaseReports::$app->reports->getDateRanges();
 
         return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/orderhistory/_settings', [
-            'defaultStartDate' => new \DateTime($defaultStartDate),
-            'defaultEndDate' => new \DateTime($defaultEndDate),
+            'defaultStartDate' => new DateTime($defaultStartDate),
+            'defaultEndDate' => new DateTime($defaultEndDate),
             'dateRanges' => $dateRanges,
             'settings' => $settings
         ]);
@@ -90,9 +103,9 @@ class CommerceOrderHistoryDataSource extends DataSource
      * Aggregates all results into a single line with totals
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function getReportWithCalculateTotals()
+    protected function getReportWithCalculateTotals(): array
     {
         /**
          * @var $reportModel Report
@@ -105,7 +118,7 @@ class CommerceOrderHistoryDataSource extends DataSource
         $endDate = $startEndDate->getEndDate();
 
         $query = new Query();
-        $query->select("SUM([[orders.totalPaid]]) as totalRevenue")
+        $query->select('SUM([[orders.totalPaid]]) as totalRevenue')
             ->from('{{%commerce_orders}} as orders');
 
         if ($startDate && $endDate) {
@@ -117,8 +130,8 @@ class CommerceOrderHistoryDataSource extends DataSource
 
         if (!empty($results)) {
             foreach ($results as $key => $result) {
-                $totalTax = $this->getTotalAdjustmentByType(null, 'Tax');
-                $totalShipping = $this->getTotalAdjustmentByType(null, 'Shipping');
+                $totalTax = $this->getTotalAdjustmentByType('Tax');
+                $totalShipping = $this->getTotalAdjustmentByType('Shipping');
 
                 $productRevenue = $result['totalRevenue'] - ($totalTax + $totalShipping);
 
@@ -134,14 +147,13 @@ class CommerceOrderHistoryDataSource extends DataSource
         return $results;
     }
 
-
     /**
      * Returns a row for each order in a given time period
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function getReportWithLineItems()
+    protected function getReportWithLineItems(): array
     {
         /**
          * @var $reportModel Report
@@ -173,8 +185,8 @@ class CommerceOrderHistoryDataSource extends DataSource
 
         if (!empty($orders)) {
             foreach ($orders as $key => $order) {
-                $totalTax = $this->getTotalAdjustmentByType($order, 'Tax');
-                $totalShipping = $this->getTotalAdjustmentByType($order, 'Shipping');
+                $totalTax = $this->getTotalAdjustmentByType('Tax', $order);
+                $totalShipping = $this->getTotalAdjustmentByType('Shipping', $order);
 
                 $productRevenue = $orders[$key]['totalPaid'] - ($totalShipping + $totalTax);
 
@@ -187,10 +199,12 @@ class CommerceOrderHistoryDataSource extends DataSource
                 $orders[$key]['Total Revenue'] = number_format($orders[$key]['totalPaid'], 2);
                 $orders[$key]['Date Ordered'] = $dateOrdered->format('Y-m-d H:i:s');
 
-                unset($orders[$key]['number']);
-                unset($orders[$key]['orderId']);
-                unset($orders[$key]['totalPaid']);
-                unset($orders[$key]['dateOrdered']);
+                unset(
+                    $orders[$key]['number'],
+                    $orders[$key]['orderId'],
+                    $orders[$key]['totalPaid'],
+                    $orders[$key]['dateOrdered']
+                );
             }
         }
 
@@ -200,13 +214,13 @@ class CommerceOrderHistoryDataSource extends DataSource
     /**
      * Calculate total tax and shipping include base values on orders table
      *
-     * @param null $order
      * @param      $type
+     * @param null $order
      *
      * @return bool|false|null|string
-     * @throws \Exception
+     * @throws Exception
      */
-    private function getTotalAdjustmentByType($order = null, $type)
+    private function getTotalAdjustmentByType($type, $order = null)
     {
         $orderId = $order['orderId'];
 
@@ -245,7 +259,7 @@ class CommerceOrderHistoryDataSource extends DataSource
      * @param $options
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function prepOptions($options)
     {

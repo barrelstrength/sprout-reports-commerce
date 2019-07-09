@@ -10,6 +10,8 @@ use craft\commerce\elements\Variant;
 use craft\helpers\DateTimeHelper;
 use craft\db\Query;
 use Craft;
+use DateTime;
+use Exception;
 
 class CommerceProductRevenueDataSource extends DataSource
 {
@@ -33,7 +35,7 @@ class CommerceProductRevenueDataSource extends DataSource
      * @param array $options
      *
      * @return null|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function getSettingsHtml(array $options = [])
     {
@@ -65,8 +67,8 @@ class CommerceProductRevenueDataSource extends DataSource
 
         return Craft::$app->getView()->renderTemplate('sprout-reports-commerce/datasources/productrevenue/_settings', [
             'settings' => $settings,
-            'defaultStartDate' => new \DateTime($defaultStartDate),
-            'defaultEndDate' => new \DateTime($defaultEndDate),
+            'defaultStartDate' => new DateTime($defaultStartDate),
+            'defaultEndDate' => new DateTime($defaultEndDate),
             'dateRanges' => $dateRanges
         ]);
     }
@@ -79,7 +81,7 @@ class CommerceProductRevenueDataSource extends DataSource
      * @param array  $settings
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getResults(Report $report, array $settings = []): array
     {
@@ -178,9 +180,9 @@ class CommerceProductRevenueDataSource extends DataSource
      * @param array $options
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
-    public function prepOptions(array $options)
+    public function prepOptions(array $options): array
     {
         $options['startDate'] = DateTimeHelper::toDateTime($options['startDate']);
         $options['endDate'] = DateTimeHelper::toDateTime($options['endDate']);
