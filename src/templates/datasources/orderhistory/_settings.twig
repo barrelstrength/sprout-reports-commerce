@@ -1,10 +1,9 @@
 {% import "_includes/forms" as forms %}
 
-
 {{ forms.selectField({
     id: "dateRange",
     name: "settings[dateRange]",
-    label: "Date Ranges",
+    label: "Date Ranges"|t('sprout-reports-commerce'),
     fieldClass: 'field-border-top',
     options: dateRanges,
     value: settings.dateRange is defined ? settings.dateRange : null
@@ -12,7 +11,7 @@
 
 <div id="custom-date-range">
     {{ forms.dateTimeField({
-        label: "Start Date"|t,
+        label: "Start Date"|t('sprout-reports-commerce'),
         instructions: "The start date of the date range you wish to display in your report."|t,
         id: 'startDate',
         name: 'settings[startDate]',
@@ -21,7 +20,7 @@
     }) }}
 
     {{ forms.dateTimeField({
-        label: "End Date"|t,
+        label: "End Date"|t('sprout-reports-commerce'),
         instructions: "The end date of the date range you wish to display in your report."|t,
         id: 'endDate',
         name: 'settings[endDate]',
@@ -30,7 +29,7 @@
 </div>
 
 {{ forms.lightswitchField({
-    label: "Calculate Total"|t,
+    label: "Calculate Total"|t('sprout-reports-commerce'),
     instructions: "Display the sum of all results as a single line."|t,
     name: 'settings[calculateTotals]',
     on: settings.calculateTotals is defined ? settings.calculateTotals : null
