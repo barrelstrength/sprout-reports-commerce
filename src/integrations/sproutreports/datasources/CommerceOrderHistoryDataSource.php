@@ -218,7 +218,10 @@ class CommerceOrderHistoryDataSource extends DataSource
         $query = new Query();
         $query->select('SUM([[orderadjustments.amount]])')
             ->from('{{%commerce_orders}} as orders')
-            ->leftJoin('{{%commerce_orderadjustments}} as orderadjustments', '[[orders.id]] = [[orderadjustments.orderId]]')
+            ->leftJoin(
+                '{{%commerce_orderadjustments}} as orderadjustments',
+                '[[orders.id]] = [[orderadjustments.orderId]]'
+            )
             ->where("[[orderadjustments.type]] = '$type'");
 
         if ($orderId != null) {
@@ -231,7 +234,7 @@ class CommerceOrderHistoryDataSource extends DataSource
             $startDate = $startEndDate->getStartDate();
             $endDate = $startEndDate->getEndDate();
 
-            $query->andWhere(['>=', 'orders.dateOrdered  :startDate', $startDate->format('Y-m-d H:i:s')]);
+            $query->andWhere(['>=', 'orders.dateOrdered', $startDate->format('Y-m-d H:i:s')]);
             $query->andWhere(['<=', 'orders.dateOrdered', $endDate->format('Y-m-d H:i:s')]);
         }
 
