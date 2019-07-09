@@ -16,7 +16,7 @@ class CommerceProductRevenueDataSource extends DataSource
     /**
      * @return string
      */
-    public function getName(): string
+    public static function displayName(): string
     {
         return Craft::t('sprout-reports-commerce','Commerce Product Revenue');
     }
@@ -100,56 +100,58 @@ class CommerceProductRevenueDataSource extends DataSource
 
         $query = new Query();
         $query->select('
-            variants.id as variantId,
-            products.id as productId,
-            SUM(lineitems.total) as total,
-            SUM(lineitems.saleAmount) as saleAmount,
-            SUM(lineitems.salePrice * lineitems.qty) as productRevenue,
-            SUM(lineitems.qty) as quantitySold,
-            variants.sku as SKU')
-            ->from('commerce_orders as orders')
-            ->leftJoin('commerce_lineitems as lineitems', 'orders.id = lineitems.orderId')
-            ->leftJoin('commerce_variants as variants', 'lineitems.purchasableId = variants.id')
-            ->leftJoin('commerce_products as products', 'variants.productId = products.id');
+            [[variants.id]] as variantId,
+            [[products.id]] as productId,
+            SUM([[lineitems.total]]) as total,
+            SUM([[lineitems.saleAmount]]) as saleAmount,
+            SUM([[lineitems.salePrice]] * [[lineitems.qty]]) as productRevenue,
+            SUM([[lineitems.qty]]) as quantitySold,
+            [[variants.sku]] as SKU')
+            ->from('{{%commerce_orders}} as orders')
+            ->leftJoin('{{%commerce_lineitems}} as lineitems', '[[orders.id]] = [[lineitems.orderId]]')
+            ->leftJoin('{{%commerce_variants}} as variants', '[[lineitems.purchasableId]] = [[variants.id]]')
+            ->leftJoin('{{%commerce_products}} as products', '[[variants.productId]] = [[products.id]]');
 
         if ($startDate && $endDate) {
-            $query->andWhere('orders.dateOrdered >= :startDate', [':startDate' => $startDate->format('Y-m-d H:i:s')]);
-            $query->andWhere('orders.dateOrdered <= :endDate', [':endDate' => $endDate->format('Y-m-d H:i:s')]);
+            $query->andWhere(['>=', '[[orders.dateOrdered]]', $startDate->format('Y-m-d H:i:s')]);
+            $query->andWhere(['<=', '[[orders.dateOrdered]]', $endDate->format('Y-m-d H:i:s')]);
         }
 
         $query->groupBy('variantId');
 
-        $query->orderBy(['products.id' => SORT_DESC]);
+        $query->orderBy(['[[products.id]]' => SORT_DESC]);
 
         $results = $query->all();
+
         $rows = [];
         if ($results) {
             foreach ($results as $key => $result) {
+//                if ($result['productId'] === null) {
+//                    continue;
+//                }
                 #$lineItemId = $result['lineItemId'];
                 #$lineItem = \craft\commerce\Plugin::getInstance()->lineItems->getLineItemById($lineItemId);
 
                 $productId = $result['productId'];
                 $variantId = $result['variantId'];
-                $rows[$key]['Variant ID'] = $variantId;
-                $rows[$key]['Product ID'] = $productId;
+                $rows[$key]['Variant ID'] = $variantId ?? '–';
+                $rows[$key]['Product ID'] = $productId ?? '–';
                 $rows[$key]['Line Item Revenue'] = number_format($result['total'], 2);
                 $rows[$key]['Sale Amount'] = number_format($result['saleAmount'], 2);
                 #$rows[$key]['Shipping Cost'] = number_format($lineItem->getAdjustmentsTotalByType('shipping'), 2);
                 #$rows[$key]['Tax'] = number_format($lineItem->getAdjustmentsTotalByType('tax'), 2);
                 $rows[$key]['Product Revenue'] = number_format($result['productRevenue'], 2);
                 $rows[$key]['Quantity Sold'] = $result['quantitySold'];
-                $rows[$key]['SKU'] = $result['SKU'];
+                $rows[$key]['SKU'] = $result['SKU'] ?? '–';
 
-                /**
-                 * @var $productElement Product
-                 */
-                $productElement = Craft::$app->elements->getElementById($productId);
+                /**@var $productElement Product */
+                $productElement = $productId ? Craft::$app->elements->getElementById($productId) : null;
 
                 if (!empty($displayVariants)) {
                     /**
                      * @var $variantElement Variant
                      */
-                    $variantElement = Craft::$app->elements->getElementById($variantId);
+                    $variantElement = $variantId ? Craft::$app->elements->getElementById($variantId) : null;
 
                     if ($variantElement) {
                         $rows[$key]['Variant Title'] = $variantElement->title;
@@ -179,7 +181,6 @@ class CommerceProductRevenueDataSource extends DataSource
      */
     public function prepOptions(array $options)
     {
-
         $options['startDate'] = DateTimeHelper::toDateTime($options['startDate']);
         $options['endDate'] = DateTimeHelper::toDateTime($options['endDate']);
 

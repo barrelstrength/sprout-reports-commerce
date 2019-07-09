@@ -14,7 +14,7 @@ class CommerceOrderHistoryDataSource extends DataSource
 
     private $reportModel;
 
-    public function getName(): string
+    public static function displayName(): string
     {
         return Craft::t('sprout-reports-commerce', 'Commerce Order History');
     }
@@ -103,16 +103,12 @@ class CommerceOrderHistoryDataSource extends DataSource
         $endDate   = $startEndDate->getEndDate();
 
         $query = new Query();
-        $query->select("SUM(orders.totalPaid) as totalRevenue")
+        $query->select("SUM([[orders.totalPaid]]) as totalRevenue")
             ->from('{{%commerce_orders}} as orders');
 
         if ($startDate && $endDate) {
-            $query->andWhere('orders.dateOrdered >= :startDate', [
-                ':startDate' => $startDate->format('Y-m-d H:i:s')
-            ]);
-            $query->andWhere('orders.dateOrdered <= :endDate', [
-                ':endDate' => $endDate->format('Y-m-d H:i:s')
-            ]);
+            $query->andWhere(['>=', '[[orders.dateOrdered]]', $startDate->format('Y-m-d H:i:s')]);
+            $query->andWhere(['<=', '[[orders.dateOrdered]]', $endDate->format('Y-m-d H:i:s')]);
         }
 
         $results = $query->all();
@@ -156,24 +152,19 @@ class CommerceOrderHistoryDataSource extends DataSource
 
         $query = new Query();
 
-        $query->select("orders.id as orderId, 
-                      orders.number,
-                      orders.totalPaid,
-                      orders.dateOrdered")
+        $query->select('[[orders.id]] as orderId, 
+                      [[orders.number]],
+                      [[orders.totalPaid]],
+                      [[orders.dateOrdered]]')
             ->from('{{%commerce_orders}} as orders');
 
 
         if ($startDate && $endDate) {
-            $query->andWhere('orders.dateOrdered >= :startDate', [
-                ':startDate' => $startDate->format('Y-m-d H:i:s')
-            ]);
-
-            $query->andWhere('orders.dateOrdered <= :endDate', [
-                ':endDate' => $endDate->format('Y-m-d H:i:s')
-            ]);
+            $query->andWhere(['>=', '[[orders.dateOrdered]]', $startDate->format('Y-m-d H:i:s')]);
+            $query->andWhere(['<=', '[[orders.dateOrdered]]', $endDate->format('Y-m-d H:i:s')]);
         }
 
-        $query->orderBy(['dateOrdered' => SORT_DESC]);
+        $query->orderBy(['[[orders.dateOrdered]]' => SORT_DESC]);
 
         $orders = $query->all();
 
@@ -222,16 +213,14 @@ class CommerceOrderHistoryDataSource extends DataSource
         $reportModel = $this->reportModel;
 
         $query = new Query();
-            $query->select('SUM(orderadjustments.amount)')
+            $query->select('SUM([[orderadjustments.amount]])')
             ->from('{{%commerce_orders}} as orders')
-            ->leftJoin('{{%commerce_orderadjustments}} as orderadjustments', 'orders.id = orderadjustments.orderId')
-            ->where("orderadjustments.type = '$type'");
+            ->leftJoin('{{%commerce_orderadjustments}} as orderadjustments', '[[orders.id]] = [[orderadjustments.orderId]]')
+            ->where("[[orderadjustments.type]] = '$type'");
 
         if ($orderId != null) {
             // For Line Item Order History Report
-            $query->andWhere('orderadjustments.orderId = :orderId', [
-                'orderId' => $orderId
-            ]);
+            $query->andWhere(['[[orderadjustments.orderId]]' => $orderId]);
         } else {
             // For Aggregate Order History Report
             $startEndDate = $reportModel->getStartEndDate();
@@ -239,12 +228,8 @@ class CommerceOrderHistoryDataSource extends DataSource
             $startDate = $startEndDate->getStartDate();
             $endDate   = $startEndDate->getEndDate();
 
-            $query->andWhere('orders.dateOrdered >= :startDate', [
-                ':startDate' => $startDate->format('Y-m-d H:i:s')
-            ]);
-            $query->andWhere('orders.dateOrdered <= :endDate', [
-                ':endDate' => $endDate->format('Y-m-d H:i:s')
-            ]);
+            $query->andWhere(['>=', 'orders.dateOrdered  :startDate', $startDate->format('Y-m-d H:i:s')]);
+            $query->andWhere(['<=', 'orders.dateOrdered', $endDate->format('Y-m-d H:i:s')]);
         }
 
         return $query->scalar();
