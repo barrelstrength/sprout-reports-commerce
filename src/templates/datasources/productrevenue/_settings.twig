@@ -4,19 +4,19 @@
     id: "dateRange",
     name: "settings[dateRange]",
     label: "Date Ranges"|t('sprout-reports-commerce'),
-    fieldClass: 'field-border-top',
     options: dateRanges,
-    value: settings.dateRange is defined ? settings.dateRange : null
+    value: settings.dateRange is defined ? settings.dateRange : null,
+    toggle: true,
+    targetPrefix: 'sprout-date-range-',
 }) }}
 
-<div id="custom-date-range">
+<div id="sprout-date-range-customRange" class="field{% if settings.dateRange != 'customRange' %} hidden{% endif %}">
     {{ forms.dateTimeField({
         label: "Start Date"|t('sprout-reports-commerce'),
         instructions: "The start date of the date range you wish to display in your report."|t,
         id: 'startDate',
         name: 'settings[startDate]',
-        value: settings.startDate is defined ? settings.startDate : defaultStartDate,
-        first: true
+        value: settings.startDate is defined ? settings.startDate : defaultStartDate
     }) }}
 
     {{ forms.dateTimeField({
@@ -38,4 +38,4 @@
     offLabel: "Disable"|t
 }) }}
 
-{% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\base\\SproutReportsAsset") %}
+{% do view.registerAssetBundle("barrelstrength\\sproutbasereports\\web\\assets\\reports\\SproutReportsAsset") %}
