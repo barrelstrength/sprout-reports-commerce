@@ -1,16 +1,18 @@
 {% import "_includes/forms" as forms %}
 
+{% set dateRange = settings.dateRange is defined ? settings.dateRange : 'customRange' %}
+
 {{ forms.selectField({
     id: "dateRange",
     name: "settings[dateRange]",
     label: "Date Ranges"|t('sprout-reports-commerce'),
     options: dateRanges,
-    value: settings.dateRange is defined ? settings.dateRange : null,
+    value: dateRange,
     toggle: true,
     targetPrefix: 'sprout-date-range-',
 }) }}
 
-<div id="sprout-date-range-customRange" class="field{% if settings.dateRange != 'customRange' %} hidden{% endif %}">
+<div id="sprout-date-range-customRange" class="field{% if dateRange != 'customRange' %} hidden{% endif %}">
     {{ forms.dateTimeField({
         label: "Start Date"|t('sprout-reports-commerce'),
         instructions: "The start date of the date range you wish to display in your report."|t,
