@@ -3,10 +3,10 @@
 ## 1.0.2 - 2020-03-14
 
 ### Changed
-- Updated `barrelstrength/sprout-base-reports` requirement to v1.4.3
+- Updated `barrelstrength/sprout-reports` requirement to v1.3.3
 
 ### Fixed
-- Fixed asset bath path to be compatible with updates in `barrelstrength/sprout-base-reports`
+- Fixed asset base path to be compatible with updates in `barrelstrength/sprout-base-reports`
 - Fixed date range output to be compatible with updates in `barrelstrength/sprout-base-reports`
 - Fixed bug where `dataSourceBaseUrl` was not defined after editing a report with validation errors
 
