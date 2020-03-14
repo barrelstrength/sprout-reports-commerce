@@ -1,6 +1,6 @@
 # Commerce Data Source for Sprout Reports Changelog
 
-## 1.0.2 - 2020-03-14
+## 1.0.3 - 2020-03-14
 
 ### Changed
 - Updated `barrelstrength/sprout-reports` requirement to v1.3.3
