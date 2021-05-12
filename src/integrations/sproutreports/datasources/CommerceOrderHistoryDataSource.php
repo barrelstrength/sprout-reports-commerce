@@ -107,9 +107,7 @@ class CommerceOrderHistoryDataSource extends DataSource
      */
     protected function getReportWithCalculateTotals(): array
     {
-        /**
-         * @var $reportModel Report
-         */
+        /** @var $reportModel Report */
         $reportModel = $this->reportModel;
 
         $startEndDate = $reportModel->getStartEndDate();
@@ -155,9 +153,7 @@ class CommerceOrderHistoryDataSource extends DataSource
      */
     protected function getReportWithLineItems(): array
     {
-        /**
-         * @var $reportModel Report
-         */
+        /** @var $reportModel Report */
         $reportModel = $this->reportModel;
 
         $startEndDate = $reportModel->getStartEndDate();
@@ -172,7 +168,6 @@ class CommerceOrderHistoryDataSource extends DataSource
                       [[orders.totalPaid]],
                       [[orders.dateOrdered]]')
             ->from('{{%commerce_orders}} as orders');
-
 
         if ($startDate && $endDate) {
             $query->andWhere(['>=', '[[orders.dateOrdered]]', $startDate->format('Y-m-d H:i:s')]);
@@ -222,11 +217,9 @@ class CommerceOrderHistoryDataSource extends DataSource
      */
     private function getTotalAdjustmentByType($type, $order = null)
     {
-        $orderId = $order['orderId'];
+        $orderId = $order['orderId'] ?? null;
 
-        /**
-         * @var $reportModel Report
-         */
+        /** @var $reportModel Report */
         $reportModel = $this->reportModel;
 
         $query = new Query();
@@ -238,7 +231,7 @@ class CommerceOrderHistoryDataSource extends DataSource
             )
             ->where("[[orderadjustments.type]] = '$type'");
 
-        if ($orderId != null) {
+        if ($orderId !== null) {
             // For Line Item Order History Report
             $query->andWhere(['[[orderadjustments.orderId]]' => $orderId]);
         } else {
