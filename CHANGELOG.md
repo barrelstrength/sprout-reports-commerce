@@ -1,5 +1,15 @@
 # Commerce Data Source for Sprout Reports Changelog
 
+## 1.0.5 - 2021-05-11
+
+### Fixed
+
+- Fixed bug when running Order History report with calculate totals setting enabled ([#8])
+- Updated Order History and Product Revenue Data Sources to exclude deleted Elements ([#9])
+  
+[#8]: https://github.com/barrelstrength/craft-sprout-reports-commerce/issues/8
+[#9]: https://github.com/barrelstrength/craft-sprout-reports-commerce/issues/9
+
 ## 1.0.4 - 2020-03-14
 
 ### Changed
