@@ -109,7 +109,7 @@ class CommerceProductRevenueDataSource extends DataSource
             ->leftJoin('{{%commerce_variants}} as variants', '[[lineitems.purchasableId]] = [[variants.id]]')
             ->leftJoin('{{%commerce_products}} as products', '[[variants.productId]] = [[products.id]]')
             ->leftJoin(['elements' => Table::ELEMENTS], '[[orders.id]] = [[elements.id]]')
-            ->where(['not', ['elements.dateDeleted' => null]]);
+            ->where(['elements.dateDeleted' => null]);
 
         if ($startDate && $endDate) {
             $query->andWhere(['>=', '[[orders.dateOrdered]]', $startDate->format('Y-m-d H:i:s')]);

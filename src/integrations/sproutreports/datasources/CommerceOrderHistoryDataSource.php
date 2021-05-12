@@ -119,8 +119,8 @@ class CommerceOrderHistoryDataSource extends DataSource
         $query = new Query();
         $query->select('SUM([[orders.totalPaid]]) as totalRevenue')
             ->from('{{%commerce_orders}} as orders')
-            ->innerJoin(['elements' => Table::ELEMENTS], '[[orders.id]] = [[elements.id]]')
-            ->where(['not', ['elements.dateDeleted' => null]]);
+            ->leftJoin(['elements' => Table::ELEMENTS], '[[orders.id]] = [[elements.id]]')
+            ->where(['elements.dateDeleted' => null]);
 
         if ($startDate && $endDate) {
             $query->andWhere(['>=', '[[orders.dateOrdered]]', $startDate->format('Y-m-d H:i:s')]);
@@ -171,8 +171,8 @@ class CommerceOrderHistoryDataSource extends DataSource
                       [[orders.totalPaid]],
                       [[orders.dateOrdered]]')
             ->from('{{%commerce_orders}} as orders')
-            ->innerJoin(['elements' => Table::ELEMENTS], '[[orders.id]] = [[elements.id]]')
-            ->where(['not', ['elements.dateDeleted' => null]]);
+            ->leftJoin(['elements' => Table::ELEMENTS], '[[orders.id]] = [[elements.id]]')
+            ->where(['elements.dateDeleted' => null]);
 
         if ($startDate && $endDate) {
             $query->andWhere(['>=', '[[orders.dateOrdered]]', $startDate->format('Y-m-d H:i:s')]);

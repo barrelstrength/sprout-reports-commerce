@@ -1,5 +1,11 @@
 # Commerce Data Source for Sprout Reports Changelog
 
+## 1.0.6 - 2021-05-12
+
+### Fixed
+
+- Fixed bug around querying deleted Elements ([#9])
+
 ## 1.0.5 - 2021-05-11
 
 ### Fixed
