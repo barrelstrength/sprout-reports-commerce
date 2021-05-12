@@ -5,6 +5,7 @@ namespace barrelstrength\sproutreportscommerce\integrations\sproutreports\dataso
 use barrelstrength\sproutbasereports\base\DataSource;
 use barrelstrength\sproutbasereports\elements\Report;
 use barrelstrength\sproutbasereports\SproutBaseReports;
+use craft\db\Table;
 use craft\helpers\DateTimeHelper;
 use craft\db\Query;
 use Craft;
@@ -117,7 +118,9 @@ class CommerceOrderHistoryDataSource extends DataSource
 
         $query = new Query();
         $query->select('SUM([[orders.totalPaid]]) as totalRevenue')
-            ->from('{{%commerce_orders}} as orders');
+            ->from('{{%commerce_orders}} as orders')
+            ->innerJoin(['elements' => Table::ELEMENTS], '[[orders.id]] = [[elements.id]]')
+            ->where(['not', ['elements.dateDeleted' => null]]);
 
         if ($startDate && $endDate) {
             $query->andWhere(['>=', '[[orders.dateOrdered]]', $startDate->format('Y-m-d H:i:s')]);
@@ -167,7 +170,9 @@ class CommerceOrderHistoryDataSource extends DataSource
                       [[orders.number]],
                       [[orders.totalPaid]],
                       [[orders.dateOrdered]]')
-            ->from('{{%commerce_orders}} as orders');
+            ->from('{{%commerce_orders}} as orders')
+            ->innerJoin(['elements' => Table::ELEMENTS], '[[orders.id]] = [[elements.id]]')
+            ->where(['not', ['elements.dateDeleted' => null]]);
 
         if ($startDate && $endDate) {
             $query->andWhere(['>=', '[[orders.dateOrdered]]', $startDate->format('Y-m-d H:i:s')]);
