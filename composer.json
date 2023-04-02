@@ -3,6 +3,7 @@
     "description": "A collection of Commerce-related Data Sources for Sprout Reports",
     "version": "1.0.6",
     "type": "craft-plugin",
+    "abandoned": "barrelstrength/sprout-data-studio",
     "keywords": [
         "craft",
         "cms",
